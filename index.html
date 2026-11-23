@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clases Virtuales • Franco Muscó</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="min-h-full font-sans text-slate-100 antialiased flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950">
+
+    <!-- HEADER -->
+    <header class="border-b border-slate-800/80 bg-slate-900/70 backdrop-blur-md sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-sky-500 text-white p-2.5 rounded-xl shadow-lg shadow-sky-500/20">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg sm:text-xl text-white leading-tight">Clases Virtuales</h1>
+                    <p class="text-xs text-slate-400">Prof. Franco Muscó • Repositorio de Guías Interactivas</p>
+                </div>
+            </div>
+            <a href="https://github.com/stickyfran/clasesvirtuales" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition">
+                <i class="fa-brands fa-github text-base"></i>
+                <span>Ver en GitHub</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
+        <!-- Buscador y estado -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+            <div>
+                <h2 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-folder-open text-sky-400"></i> Guías y Materiales Disponibles
+                </h2>
+                <p id="statusText" class="text-xs text-slate-400 mt-0.5">Sincronizando archivos del repositorio...</p>
+            </div>
+            <div class="relative w-full sm:w-72">
+                <i class="fa-solid fa-magnifying-glass text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 text-xs"></i>
+                <input type="text" id="searchInput" oninput="filterCards()" placeholder="Buscar guía o materia..." class="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
+            </div>
+        </div>
+
+        <!-- Grid de archivos -->
+        <div id="filesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+        <!-- Mensaje vacío -->
+        <div id="emptyState" class="hidden text-center py-12 bg-slate-900/50 border border-slate-800 rounded-2xl">
+            <i class="fa-solid fa-file-circle-question text-3xl text-slate-600 mb-2"></i>
+            <p class="text-sm text-slate-400">No se encontraron guías que coincidan con tu búsqueda.</p>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 py-5 text-center text-xs text-slate-500">
+        <p>© 2026 Clases Virtuales • Prof. Franco Muscó • Actualización automática desde GitHub</p>
+    </footer>
+
+    <script>
+        const REPO_OWNER = 'stickyfran';
+        const REPO_NAME = 'clasesvirtuales';
+
+        // Lista de respaldo por si se abre sin conexión o con límite de API
+        const FALLBACK_FILES = [
+            {
+                name: 'ProbabilidadyEstadisticaUBA-UTN.html',
+                size: 945000
+            }
+        ];
+
+        let allGuides = [];
+
+        function formatTitle(filename) {
+            return filename
+                .replace(/\.html?$/i, '')
+                .replace(/[-_]+/g, ' ')
+                .replace(/([a-z])([A-Z])/g, '$1 $2')
+                .trim();
+        }
+
+        function formatSize(bytes) {
+            if (!bytes) return '';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function renderCards(files) {
+            const grid = document.getElementById('filesGrid');
+            const empty = document.getElementById('emptyState');
+
+            if (!files.length) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            grid.innerHTML = files.map(file => {
+                const title = formatTitle(file.name);
+                const sizeLabel = formatSize(file.size);
+                return `
+                    <a href="./${encodeURIComponent(file.name)}" class="group bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-sky-500/60 rounded-2xl p-5 transition shadow-lg flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-3.5 min-w-0">
+                            <div class="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-400 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-sm sm:text-base text-white group-hover:text-sky-300 transition truncate">${title}</h3>
+                                <p class="text-xs text-slate-400 font-mono truncate mt-0.5">${file.name}</p>
+                                ${sizeLabel ? `<span class="inline-block mt-2 text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">${sizeLabel}</span>` : ''}
+                            </div>
+                        </div>
+                        <span class="text-slate-500 group-hover:text-sky-400 transition mt-1">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </span>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        function filterCards() {
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = allGuides.filter(f =>
+                f.name.toLowerCase().includes(q) || formatTitle(f.name).toLowerCase().includes(q)
+            );
+            renderCards(filtered);
+        }
+
+        async function loadRepoFiles() {
+            const status = document.getElementById('statusText');
+            try {
+                const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/`);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const items = await res.json();
+                const htmlFiles = items
+                    .filter(it => it.type === 'file' && /\.html?$/i.test(it.name) && it.name.toLowerCase() !== 'index.html')
+                    .sort((a, b) => a.name.localeCompare(b.name));
+
+                allGuides = htmlFiles.length ? htmlFiles : FALLBACK_FILES;
+                status.textContent = `${allGuides.length} guía${allGuides.length === 1 ? '' : 's'} encontrada${allGuides.length === 1 ? '' : 's'} en el repositorio.`;
+                renderCards(allGuides);
+            } catch (err) {
+                allGuides = FALLBACK_FILES;
+                status.textContent = 'Mostrando listado local (sin conexión a la API de GitHub).';
+                renderCards(allGuides);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadRepoFiles);
+    </script>
+</body>
+</html>
