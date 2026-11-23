@@ -72,7 +72,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight sm:text-xl">Análisis Estadístico I</h1>
-                    <p id="activeChapterSubtitle" class="text-xs text-slate-400">Prof. Franco Muscó • Cap. 2 (Tema 5): Distribución Normal y Derivadas</p>
+                    <p id="activeChapterSubtitle" class="text-xs text-slate-400">Prof. Franco Muscó • Índice de Contenidos</p>
                 </div>
             </div>
 
@@ -88,16 +88,16 @@
         <nav id="chapterTabsNav" class="bg-slate-800 border-t border-slate-700/60 overflow-x-auto scrollbar-none">
             <div class="max-w-7xl mx-auto px-4 flex whitespace-nowrap min-w-max">
                 <!-- Cap 1 -->
-                <div id="chapterTabs-cap1" class="chapter-tabs-group hidden flex whitespace-nowrap">
-                    <button onclick="switchMainTab('cap1Tab')" id="cap1Tab-btn" class="tab-btn inline-flex items-center gap-2.5 px-5 py-3 border-b-2 border-transparent font-medium text-sm text-slate-300 hover:text-white transition">
-                        <i class="fa-solid fa-hourglass-half"></i>
-                        <span>Temas 1 a 4 (Próximamente)</span>
+                <div id="chapterTabs-cap1" class="chapter-tabs-group flex whitespace-nowrap">
+                    <button onclick="switchMainTab('cap1Tab')" id="cap1Tab-btn" class="tab-btn active inline-flex items-center gap-2.5 px-5 py-3 border-b-2 border-transparent font-medium text-sm text-slate-300 hover:text-white transition">
+                        <i class="fa-solid fa-compass"></i>
+                        <span>Índice • Temas 1 a 4 (Próximamente)</span>
                     </button>
                 </div>
 
                 <!-- Cap 2 (Tema 5 - Original Activo) -->
-                <div id="chapterTabs-cap2" class="chapter-tabs-group flex whitespace-nowrap">
-                    <button onclick="switchMainTab('normalTab')" id="normalTab-btn" class="tab-btn active inline-flex items-center gap-2.5 px-5 py-3 border-b-2 border-transparent font-medium text-sm text-slate-300 hover:text-white transition">
+                <div id="chapterTabs-cap2" class="chapter-tabs-group hidden flex whitespace-nowrap">
+                    <button onclick="switchMainTab('normalTab')" id="normalTab-btn" class="tab-btn inline-flex items-center gap-2.5 px-5 py-3 border-b-2 border-transparent font-medium text-sm text-slate-300 hover:text-white transition">
                         <i class="fa-solid fa-bell-concierge"></i>
                         <span>1. Distribución Normal</span>
                     </button>
@@ -186,7 +186,7 @@
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <!-- ==================== TAB 1: DISTRIBUCIÓN NORMAL ==================== -->
-        <section id="normalTab" class="main-tab-content space-y-8">
+        <section id="normalTab" class="main-tab-content hidden space-y-8">
             <!-- TEORÍA -->
             <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
                 <div class="flex items-center gap-3 mb-4">
@@ -2097,7 +2097,7 @@
         </section>
 
         <!-- ==================== CAPÍTULO 1: RESERVADO (TEMAS 1 A 4) ==================== -->
-        <section id="cap1Tab" class="main-tab-content hidden space-y-8" data-chapter="cap1">
+        <section id="cap1Tab" class="main-tab-content space-y-8" data-chapter="cap1">
             <div class="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200">
                 <div class="flex items-center gap-3 mb-4">
                     <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-bold tracking-wide uppercase">Capítulo 1 • Próximamente</span>
@@ -5918,7 +5918,7 @@
     </div>
 
     <!-- PESTAÑA LATERAL IZQUIERDA PARA ABRIR CAPÍTULOS -->
-    <button onclick="openChapterDrawer()" title="Abrir menú de capítulos" class="fixed left-0 top-1/2 -translate-y-1/2 z-30 bg-slate-900/95 hover:bg-brand-600 text-white px-2.5 py-4 rounded-r-xl shadow-lg border border-l-0 border-slate-700 transition flex flex-col items-center gap-2 group">
+    <button onclick="openChapterDrawer('left')" title="Abrir menú de capítulos desde la izquierda" class="fixed left-0 top-1/2 -translate-y-1/2 z-30 bg-slate-900/95 hover:bg-brand-600 text-white px-2.5 py-4 rounded-r-xl shadow-lg border border-l-0 border-slate-700 transition flex flex-col items-center gap-2 group">
         <i class="fa-solid fa-bars-staggered text-brand-400 group-hover:text-white text-sm"></i>
         <span class="text-[11px] font-bold tracking-wider uppercase" style="writing-mode: vertical-rl;">Capítulos</span>
     </button>
@@ -7157,15 +7157,30 @@
             cap7: { subtitle: 'Prof. Franco Muscó • Cap. 7: Ejercitación de Segundo Parcial y Simulacros' }
         };
 
-        function openChapterDrawer() {
+        let drawerSide = 'right';
+
+        function openChapterDrawer(side = 'right') {
+            drawerSide = side === 'left' ? 'left' : 'right';
+            const drawer = document.getElementById('chapterDrawer');
+            drawer.classList.remove('transition-transform', 'duration-300', 'left-0', 'right-0', 'border-l', 'border-r', 'translate-x-full', '-translate-x-full', 'translate-x-0');
+            if (drawerSide === 'left') {
+                drawer.classList.add('left-0', 'border-r', '-translate-x-full');
+            } else {
+                drawer.classList.add('right-0', 'border-l', 'translate-x-full');
+            }
+            void drawer.offsetWidth;
+            drawer.classList.add('transition-transform', 'duration-300');
             document.getElementById('chapterDrawerBackdrop').classList.remove('hidden');
             requestAnimationFrame(() => {
-                document.getElementById('chapterDrawer').classList.remove('translate-x-full');
+                drawer.classList.remove('translate-x-full', '-translate-x-full');
+                drawer.classList.add('translate-x-0');
             });
         }
 
         function closeChapterDrawer() {
-            document.getElementById('chapterDrawer').classList.add('translate-x-full');
+            const drawer = document.getElementById('chapterDrawer');
+            drawer.classList.remove('translate-x-0');
+            drawer.classList.add(drawerSide === 'left' ? '-translate-x-full' : 'translate-x-full');
             setTimeout(() => {
                 document.getElementById('chapterDrawerBackdrop').classList.add('hidden');
             }, 220);
