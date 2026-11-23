@@ -703,34 +703,31 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-700 leading-relaxed">
                     <div class="space-y-3">
                         <h3 class="font-semibold text-slate-900 text-lg flex items-center gap-2">
-                            <i class="fa-solid fa-circle-info text-purple-600"></i> Construcción y Definición
+                            <i class="fa-solid fa-circle-info text-purple-600"></i> ¿Qué es y para qué sirve?
                         </h3>
                         <p class="text-sm">
-                            Sean $Z_1, Z_2, \dots, Z_k$ variables aleatorias independientes e idénticamente distribuidas (IID) como Normal Estándar $N(0;1)$. Se define la variable:
-                        </p>
-                        <p class="text-center font-semibold text-purple-900 bg-purple-50 p-2.5 rounded-lg border border-purple-100 text-sm">
-                            $$Y = \sum_{i=1}^{k} Z_i^2 \sim \chi^2_k$$
+                            Es la distribución que surge al <strong>sumar $k$ variables Normales Estándar elevadas al cuadrado</strong> ($Y = \sum_{i=1}^k Z_i^2 \sim \chi^2_k$). Al ser una suma de cuadrados, <strong>solo toma valores positivos o cero</strong> y es asimétrica hacia la derecha. Sirve principalmente para hacer inferencia sobre la <strong>varianza poblacional ($\sigma^2$)</strong> y para pruebas de bondad de ajuste o independencia (tablas de frecuencias).
                         </p>
                         <ul class="text-sm space-y-1.5 list-disc list-inside bg-slate-50 p-3.5 rounded-xl border border-slate-100">
                             <li><strong>Dominio:</strong> $Y \in [0; +\infty)$ (nunca toma valores negativos)</li>
-                            <li><strong>Parámetro:</strong> $k$ (grados de libertad)</li>
-                            <li><strong>Asimetría:</strong> Sesgada a la derecha (asimetría positiva)</li>
-                            <li><strong>Uso principal:</strong> Inferencia sobre varianzas poblacionales y pruebas de bondad de ajuste / independencia.</li>
+                            <li><strong>Parámetro:</strong> $k$ (grados de libertad; en varianzas suele ser $k = n - 1$)</li>
+                            <li><strong>Momentos:</strong> $E(Y) = k$ y $Var(Y) = 2k$</li>
+                            <li><strong>Propiedad Reproductiva:</strong> Si $X \sim \chi^2_{k_1}$ e $Y \sim \chi^2_{k_2}$ son indep., $X+Y \sim \chi^2_{k_1+k_2}$</li>
                         </ul>
                     </div>
 
                     <div class="space-y-3">
                         <h3 class="font-semibold text-slate-900 text-lg flex items-center gap-2">
-                            <i class="fa-solid fa-calculator text-purple-600"></i> Momentos y Propiedades
+                            <i class="fa-solid fa-list-check text-purple-600"></i> ¿Cómo se usa paso a paso?
                         </h3>
-                        <div class="math-box p-3.5 rounded-xl text-sm space-y-1">
-                            <p><strong>1. Esperanza y Varianza Teóricas:</strong></p>
-                            <p class="text-center">$$E(Y) = k \quad \text{y} \quad Var(Y) = 2k$$</p>
+                        <div class="math-box p-3.5 rounded-xl text-sm space-y-1.5">
+                            <p><strong>1. En problemas de tabla directa o inversa:</strong></p>
+                            <p class="text-xs text-slate-600">Entras por la fila de los grados de libertad $k$ y buscas en las columnas el área acumulada a la izquierda $F(x)$ (si piden $P(X > x)$, haces $1 - F(x)$). ¡Ojo: no es simétrica, los dos extremos se buscan por separado!</p>
                         </div>
-                        <div class="math-box p-3.5 rounded-xl text-sm space-y-1">
-                            <p><strong>2. Propiedad Reproductiva:</strong></p>
-                            <p>Si $X \sim \chi^2_{k_1}$ e $Y \sim \chi^2_{k_2}$ son independientes:</p>
-                            <p class="text-center">$$X + Y \sim \chi^2_{k_1 + k_2}$$</p>
+                        <div class="math-box p-3.5 rounded-xl text-sm space-y-1.5">
+                            <p><strong>2. En problemas aplicados a la Varianza Muestral ($S^2$):</strong></p>
+                            <p class="text-center">$$V = \frac{(n - 1) S^2}{\sigma^2} \sim \chi^2_{n-1}$$</p>
+                            <p class="text-xs text-slate-600">Transformas $S^2$ al pivote $V$ y luego buscas en la tabla con $k = n - 1$.</p>
                         </div>
                     </div>
                 </div>
@@ -1168,32 +1165,30 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-700 leading-relaxed">
                     <div class="space-y-3">
                         <h3 class="font-semibold text-slate-900 text-lg flex items-center gap-2">
-                            <i class="fa-solid fa-circle-info text-emerald-600"></i> Construcción Teórica
+                            <i class="fa-solid fa-circle-info text-emerald-600"></i> ¿Qué es y para qué sirve?
                         </h3>
                         <p class="text-sm">
-                            Sea $Z \sim N(0;1)$ e $Y \sim \chi^2_k$ dos variables aleatorias <strong>independientes</strong>. Se define la variable $T$ como:
-                        </p>
-                        <p class="text-center font-semibold text-emerald-900 bg-emerald-50 p-2.5 rounded-lg border border-emerald-100 text-sm">
-                            $$T = \frac{Z}{\sqrt{Y / k}} \sim T_k$$
+                            Es una distribución en forma de campana <strong>simétrica respecto de $0$</strong>, muy parecida a la Normal Estándar pero con <strong>colas más pesadas</strong> (más abiertas en los extremos). Surge del cociente $T = \frac{Z}{\sqrt{Y/k}} \sim T_k$ (con $Z \sim N(0;1)$ e $Y \sim \chi^2_k$ indep.). Sirve para estimar, construir intervalos de confianza y probar hipótesis sobre la <strong>media poblacional $\mu$ cuando el desvío $\sigma$ es desconocido</strong> y debe estimarse con $S$.
                         </p>
                         <ul class="text-sm space-y-1.5 list-disc list-inside bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-                            <li><strong>Dominio:</strong> $t \in (-\infty; +\infty)$</li>
-                            <li><strong>Simetría:</strong> Perfectamente simétrica respecto de $0$ ($E(T) = 0$).</li>
-                            <li><strong>Colas pesadas:</strong> Presenta mayor variabilidad en los extremos que la Normal Estándar por la incertidumbre de estimar $\sigma$.</li>
+                            <li><strong>Dominio:</strong> $t \in (-\infty; +\infty)$ y <strong>Esperanza:</strong> $E(T) = 0$</li>
+                            <li><strong>Simetría perfecta:</strong> $P(T < -t) = P(T > t) = 1 - F(t)$</li>
+                            <li><strong>Convergencia:</strong> Cuando $k \to \infty$ (en la práctica $k > 30$), $T_k \to N(0;1)$</li>
                         </ul>
                     </div>
 
                     <div class="space-y-3">
                         <h3 class="font-semibold text-slate-900 text-lg flex items-center gap-2">
-                            <i class="fa-solid fa-arrow-trend-up text-emerald-600"></i> Propiedad Asintótica y Uso
+                            <i class="fa-solid fa-list-check text-emerald-600"></i> ¿Cómo se usa paso a paso?
                         </h3>
-                        <div class="math-box p-3.5 rounded-xl text-sm space-y-2">
-                            <p><strong>Convergencia a la Normal Estándar:</strong></p>
-                            <p>A medida que los grados de libertad aumentan ($k \to \infty$, en la práctica $k > 30$), la varianza muestral se vuelve estable y la distribución $T_k$ converge exactamente a $N(0;1)$.</p>
+                        <div class="math-box p-3.5 rounded-xl text-sm space-y-1.5">
+                            <p><strong>1. En la tabla $T$:</strong></p>
+                            <p class="text-xs text-slate-600">Entras por la fila de grados de libertad $k$. La tabla solo lista valores positivos: si buscas una cola izquierda negativa ($T < -c$), buscas $+c$ y usas la simetría: $P(T < -c) = 1 - F(+c)$.</p>
                         </div>
-                        <div class="math-box p-3.5 rounded-xl text-sm space-y-1">
-                            <p><strong>Uso Principal en Inferencia:</strong></p>
-                            <p>Estimación e intervalos de confianza para la media poblacional $\mu$ cuando el desvío poblacional $\sigma$ es <strong>desconocido</strong> y se usa $S$.</p>
+                        <div class="math-box p-3.5 rounded-xl text-sm space-y-1.5">
+                            <p><strong>2. En problemas de media muestral ($\sigma$ desconocido):</strong></p>
+                            <p class="text-center">$$T = \frac{\bar{X} - \mu}{S / \sqrt{n}} \sim T_{n-1}$$</p>
+                            <p class="text-xs text-slate-600">Calculas el estadístico con $S/\sqrt{n}$ y lo comparas con el valor crítico de tabla en $k = n - 1$.</p>
                         </div>
                     </div>
                 </div>
@@ -1628,34 +1623,30 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-700 leading-relaxed">
                     <div class="space-y-3">
                         <h3 class="font-semibold text-slate-900 text-lg flex items-center gap-2">
-                            <i class="fa-solid fa-circle-info text-amber-600"></i> Construcción y Definición
+                            <i class="fa-solid fa-circle-info text-amber-600"></i> ¿Qué es y para qué sirve?
                         </h3>
                         <p class="text-sm">
-                            Sean $Y \sim \chi^2_{k_1}$ y $W \sim \chi^2_{k_2}$ dos variables Chi-Cuadrado <strong>independientes</strong>. Se define la variable aleatoria $F$ como el cociente de sus varianzas escaladas:
-                        </p>
-                        <p class="text-center font-semibold text-amber-900 bg-amber-50 p-2.5 rounded-lg border border-amber-100 text-sm">
-                            $$F = \frac{Y / k_1}{W / k_2} \sim F(k_1; k_2)$$
+                            Es la distribución que resulta al <strong>dividir dos variables Chi-Cuadrado independientes</strong> divididas por sus respectivos grados de libertad: $F = \frac{Y/k_1}{W/k_2} \sim F(k_1; k_2)$. Como es un cociente de varianzas positivas, <strong>nunca es negativa</strong> y es asimétrica a la derecha. Sirve para <strong>comparar las varianzas de dos poblaciones independientes</strong> (por ejemplo, ver si una máquina es más irregular que otra) y para el Análisis de Varianza (ANOVA).
                         </p>
                         <ul class="text-sm space-y-1.5 list-disc list-inside bg-slate-50 p-3.5 rounded-xl border border-slate-100">
                             <li><strong>Dominio:</strong> $F \in [0; +\infty)$</li>
-                            <li><strong>Parámetros:</strong> $k_1$ (grados de libertad del numerador) y $k_2$ (del denominador). ¡El orden importa!</li>
-                            <li><strong>Uso principal:</strong> Comparación de varianzas de dos poblaciones independientes y Análisis de Varianza (ANOVA).</li>
+                            <li><strong>Parámetros:</strong> $k_1$ (numerador, columnas) y $k_2$ (denominador, filas). ¡El orden importa!</li>
+                            <li><strong>Relación con $T$:</strong> Si $T \sim T_k$, entonces $T^2 \sim F(1; k)$</li>
                         </ul>
                     </div>
 
                     <div class="space-y-3">
                         <h3 class="font-semibold text-slate-900 text-lg flex items-center gap-2">
-                            <i class="fa-solid fa-star text-amber-600"></i> Propiedades Fundamentales
+                            <i class="fa-solid fa-list-check text-amber-600"></i> ¿Cómo se usa paso a paso?
                         </h3>
-                        <div class="math-box p-3.5 rounded-xl text-sm space-y-1">
-                            <p><strong>1. Propiedad de Reciprocidad (Inversa):</strong></p>
+                        <div class="math-box p-3.5 rounded-xl text-sm space-y-1.5">
+                            <p><strong>1. Lectura en tabla y Reciprocidad (cola izquierda):</strong></p>
+                            <p class="text-xs text-slate-600">Entras por columna $k_1$ y fila $k_2$ en la tabla del nivel deseado ($0{,}95$ ó $0{,}99$). Si te piden la cola izquierda ($F_{\alpha; k_1; k_2}$), inviertes el orden $(k_2; k_1)$ y tomas el recíproco:</p>
                             <p class="text-center">$$F_{1 - \alpha \;;\; k_1 ; k_2} = \frac{1}{F_{\alpha \;;\; k_2 ; k_1}}$$</p>
-                            <p class="text-xs text-slate-500">Permite hallar valores de la cola izquierda invirtiendo parámetros.</p>
                         </div>
                         <div class="math-box p-3.5 rounded-xl text-sm space-y-1">
-                            <p><strong>2. Relación con la t de Student:</strong></p>
-                            <p>Si $T \sim T_k$, entonces su cuadrado sigue una F de Snedecor:</p>
-                            <p class="text-center">$$T^2 \sim F(1; k)$$</p>
+                            <p><strong>2. Comparación de dos varianzas muestrales:</strong></p>
+                            <p class="text-center">$$F = \frac{S_1^2 / \sigma_1^2}{S_2^2 / \sigma_2^2} \sim F(n_1 - 1;\; n_2 - 1)$$</p>
                         </div>
                     </div>
                 </div>
