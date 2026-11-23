@@ -5835,6 +5835,7 @@
             </div>
 
             <div class="space-y-6">
+                <!-- EJ 1 -->
                 <div class="exercise-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" id="parc-r2-ex1">
                     <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
                         <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
@@ -5848,29 +5849,51 @@
                     </div>
                     <div class="p-5">
                         <div class="subtab-content enunciado">
-                            <p class="text-sm text-slate-700 leading-relaxed">El ingreso (en miles de &#36;) de los hogares sigue una distribución Normal. Se sabe que la mediana es &#36;65 y el tercer cuartil ($Q_3$) es &#36;68,37. Determinar el ingreso promedio $\mu$ y el desvío estándar $\sigma$.</p>
+                            <p class="text-sm text-slate-700 leading-relaxed">El ingreso (expresado en miles de &#36;) de los hogares de una ciudad puede modelarse con una distribución Normal. Se sabe que la mediana es &#36;65 y el tercer cuartil ($Q_3$) es &#36;68,37. Determinar el ingreso promedio $\mu$ y su respectivo desvío estándar $\sigma$.</p>
                         </div>
                         <div class="subtab-content solucion hidden space-y-3 text-sm">
+                            <p class="font-semibold text-amber-700">Resolución Paso a Paso:</p>
                             <ol class="list-decimal list-inside space-y-1.5 text-slate-700">
-                                <li>Por simetría de la Normal, la mediana coincide con la media: $\mu = Me = \mathbf{65}$ (mil &#36;).</li>
-                                <li>El tercer cuartil acumula $0{,}75$ a la izquierda: $z_{0{,}75} pprox 0{,}6745$.</li>
-                                <li>Despejamos $\sigma$: $0{,}6745 = rac{68{,}37 - 65}{\sigma} \implies \sigma = rac{3{,}37}{0{,}6745} pprox \mathbf{5{,}00}$ (mil &#36;).</li>
+                                <li>Por simetría de la distribución Normal, la mediana coincide exactamente con la media: $\mu = Me = \mathbf{65}$ (mil &#36;).</li>
+                                <li>El tercer cuartil ($Q_3$) acumula un $75\%$ ($0{,}75$) a su izquierda: en tabla Normal Estándar, $z_{0{,}75} \approx 0{,}6745$.</li>
+                                <li>Estandarizamos $Q_3 = 68{,}37$ y despejamos $\sigma$:
+                                    $$0{,}6745 = \frac{68{,}37 - 65}{\sigma} \implies \sigma = \frac{3{,}37}{0{,}6745} \approx \mathbf{5{,}00}\text{ (mil &#36;)}$$
+                                </li>
                             </ol>
                             <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 font-medium">
-                                <strong>Resultado final:</strong> $\mu = &#36;65$ mil y $\sigma = &#36;5$ mil.
+                                <strong>Resultado final:</strong> Ingreso promedio $\mu = &#36;65$ mil y desvío estándar $\sigma = &#36;5$ mil.
                             </div>
                             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                                <p class="text-xs font-semibold text-slate-800"><i class="fa-solid fa-chart-area text-amber-600 mr-1"></i> Representación gráfica de la respuesta</p>
                                 <div class="bg-white rounded-lg border border-slate-200 p-2"><canvas id="chart-parc-r2-ex1" class="w-full h-44 block"></canvas></div>
+                                <p class="text-xs text-slate-600"><strong>Interpretación visual:</strong> La línea punteada en $65$ divide la campana en $50\%$ y $50\%$. Al avanzar $0{,}6745$ desvíos estándar hacia la derecha ($+3{,}37$), llegamos a $Q_3 = 68{,}37$, completando el $75\%$ acumulado.</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                <div class="bg-sky-50/70 border border-sky-200 rounded-xl p-3.5 space-y-1">
+                                    <p class="font-bold text-sky-900"><i class="fa-solid fa-code-branch mr-1"></i> Otros posibles resultados ("¿Qué pasaría si...?")</p>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Si en vez de $Q_3$ te dieran el <strong>primer cuartil</strong> $Q_1$, sería simétrico: $Q_1 = 65 - 3{,}37 = \mathbf{61{,}63}$.</li>
+                                        <li>Si preguntaran por el rango intercuartil ($IQR$), sería $68{,}37 - 61{,}63 = \mathbf{6{,}74}$ (mil &#36;).</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 space-y-1">
+                                    <p class="font-bold text-rose-900"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Errores comunes a evitar</p>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li><strong>Usar $z = 0{,}75$ directo</strong> en lugar del percentil $z_{0{,}75} = 0{,}6745$ (confundir probabilidad con valor $z$).</li>
+                                        <li><strong>No recordar que $Me = \mu$</strong> en una Normal, pensando que falta un dato.</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- EJ 2 -->
                 <div class="exercise-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" id="parc-r2-ex2">
                     <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
                         <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
                             <span class="w-6 h-6 bg-amber-600 text-white rounded-full inline-flex items-center justify-center text-xs">2</span>
-                            Distribución Muestral de $H = rac{100ar{X}^2}{S^2}$ (15 puntos)
+                            Distribución Muestral de $H = \frac{100\bar{X}^2}{S^2}$ (15 puntos)
                         </span>
                         <div class="flex rounded-lg bg-slate-200/80 p-1 text-xs">
                             <button onclick="setExTab('parc-r2-ex2', 'enunciado')" class="subtab-btn active px-3 py-1 rounded-md font-medium transition">Enunciado</button>
@@ -5879,29 +5902,54 @@
                     </div>
                     <div class="p-5">
                         <div class="subtab-content enunciado">
-                            <p class="text-sm text-slate-700 leading-relaxed">Sea $X_1,\dots,X_{100}$ m.a.s. de $N(0; \sigma^2)$. Determinar la distribución de $H = rac{100ar{X}^2}{S^2}$.</p>
+                            <p class="text-sm text-slate-700 leading-relaxed">Sea $X_1, X_2, \dots, X_{100}$ una muestra aleatoria simple de una población normal $N(0; \sigma^2)$. Determinar la distribución exacta de $H = \frac{100\bar{X}^2}{S^2}$.</p>
                         </div>
                         <div class="subtab-content solucion hidden space-y-3 text-sm">
+                            <p class="font-semibold text-amber-700">Resolución Paso a Paso:</p>
                             <ol class="list-decimal list-inside space-y-1.5 text-slate-700">
-                                <li>Como $\mu=0$ y $n=100$: $Z = rac{ar{X}-0}{\sigma/\sqrt{100}} = rac{10ar{X}}{\sigma} \sim N(0;1) \implies rac{100ar{X}^2}{\sigma^2} \sim \chi^2_1$.</li>
-                                <li>Además $rac{99 S^2}{\sigma^2} \sim \chi^2_{99}$, independiente de $ar{X}$ (Teorema de Cochran/Fisher).</li>
-                                <li>Por definición de $F$: $H = rac{(100ar{X}^2/\sigma^2)/1}{(99 S^2/\sigma^2)/99} = rac{100ar{X}^2}{S^2} \sim \mathbf{F(1;\, 99)}$ (o también $T_{99}^2$).</li>
+                                <li>Como $\mu = 0$ y $n = 100$: $Z = \frac{\bar{X} - 0}{\sigma / \sqrt{100}} = \frac{10\bar{X}}{\sigma} \sim N(0; 1)$. Al elevar al cuadrado:
+                                    $$Z^2 = \frac{100\bar{X}^2}{\sigma^2} \sim \chi^2_1$$
+                                </li>
+                                <li>Por distribución de la varianza muestral en población Normal: $\frac{(n-1)S^2}{\sigma^2} = \frac{99 S^2}{\sigma^2} \sim \chi^2_{99}$.</li>
+                                <li>Por el Teorema de Cochran/Fisher, $\bar{X}$ y $S^2$ son <strong>independientes</strong> en poblaciones Normales.</li>
+                                <li>Construimos el cociente $F$ dividiendo cada $\chi^2$ por sus grados de libertad ($1$ y $99$):
+                                    $$H = \frac{(100\bar{X}^2 / \sigma^2) / 1}{(99 S^2 / \sigma^2) / 99} = \frac{100\bar{X}^2}{S^2} \sim \mathbf{F(1;\, 99)}$$
+                                </li>
                             </ol>
                             <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 font-medium">
-                                <strong>Resultado final:</strong> $H \sim \mathbf{F(1;\, 99)}$.
+                                <strong>Resultado final:</strong> $H \sim \mathbf{F(1;\, 99)}$ (equivalentemente, $H = T^2$ con $T \sim T_{99}$).
                             </div>
                             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                                <p class="text-xs font-semibold text-slate-800"><i class="fa-solid fa-chart-area text-amber-600 mr-1"></i> Representación gráfica de la respuesta</p>
                                 <div class="bg-white rounded-lg border border-slate-200 p-2"><canvas id="chart-parc-r2-ex2" class="w-full h-44 block"></canvas></div>
+                                <p class="text-xs text-slate-600"><strong>Interpretación visual:</strong> Como el numerador tiene $k_1 = 1$ grado de libertad, la densidad $F(1;\, 99)$ se concentra pegada al eje vertical y acumula el $95\%$ antes de $F_{0{,}95;\, 1;\, 99} \approx 3{,}94$.</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                <div class="bg-sky-50/70 border border-sky-200 rounded-xl p-3.5 space-y-1">
+                                    <p class="font-bold text-sky-900"><i class="fa-solid fa-code-branch mr-1"></i> Otros posibles resultados ("¿Qué pasaría si...?")</p>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Si pidieran la distribución de la raíz $\sqrt{H} = \frac{10\bar{X}}{S}$ (con signo), seguiría una <strong>$T_{99}$</strong>.</li>
+                                        <li>Si invirtieran la fracción a $H^{-1} = \frac{S^2}{100\bar{X}^2}$, seguiría una <strong>$F(99;\, 1)$</strong>.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 space-y-1">
+                                    <p class="font-bold text-rose-900"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Errores comunes a evitar</p>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li><strong>Poner $F(1;\, 100)$:</strong> La varianza muestral $S^2$ (con $n-1=99$ en el denominador) aporta $99$ grados de libertad, no $100$.</li>
+                                        <li><strong>Responder $\chi^2$:</strong> Como el denominador tiene la variable aleatoria $S^2$ (no la constante $\sigma^2$), es $F$ y no $\chi^2$.</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- EJ 3 -->
                 <div class="exercise-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" id="parc-r2-ex3">
                     <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
                         <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
                             <span class="w-6 h-6 bg-amber-600 text-white rounded-full inline-flex items-center justify-center text-xs">3</span>
-                            Varianza con Covarianza en $	ext{Poisson}(\lambda=5)$ (15 puntos)
+                            Varianza con Covarianza en $\text{Poisson}(\lambda=5)$ (15 puntos)
                         </span>
                         <div class="flex rounded-lg bg-slate-200/80 p-1 text-xs">
                             <button onclick="setExTab('parc-r2-ex3', 'enunciado')" class="subtab-btn active px-3 py-1 rounded-md font-medium transition">Enunciado</button>
@@ -5910,24 +5958,52 @@
                     </div>
                     <div class="p-5">
                         <div class="subtab-content enunciado">
-                            <p class="text-sm text-slate-700 leading-relaxed">Sea $X \sim 	ext{Poisson}(\lambda=5)$ y $Y = X - 10X^2 + 2$. Calcular $Var(Y)$ aplicando covarianza y la fórmula recursiva $E(X^{k+1}) = \lambdaig[E(X^k) + rac{d}{d\lambda}E(X^k)ig]$.</p>
+                            <p class="text-sm text-slate-700 leading-relaxed">Sea $X \sim \text{Poisson}$ con media $\lambda = 5$. Se define $Y = X - 10X^2 + 2$. Calcular $Var(Y)$ aplicando covarianza y la fórmula recursiva $E(X^{k+1}) = \lambda\left[E(X^k) + \frac{d}{d\lambda}E(X^k)\right]$.</p>
                         </div>
                         <div class="subtab-content solucion hidden space-y-3 text-sm">
+                            <p class="font-semibold text-amber-700">Resolución Paso a Paso:</p>
                             <ol class="list-decimal list-inside space-y-1.5 text-slate-700">
-                                <li>Momentos en $\lambda=5$: $E(X)=5$, $E(X^2)=30$, $E(X^3)=205$, $E(X^4)=1555$.</li>
-                                <li>$Var(X)=5$, $Var(X^2) = 1555 - 30^2 = 655$, $Cov(X,X^2) = 205 - 5(30) = 55$.</li>
-                                <li>La constante $+2$ no afecta la varianza: $Var(Y) = Var(X) + 100\,Var(X^2) - 20\,Cov(X,X^2) = 5 + 65.500 - 1.100 = \mathbf{64.405}$.</li>
+                                <li>Calculamos los momentos en función de $\lambda$ y evaluamos en $\lambda = 5$:
+                                    <ul class="list-disc list-inside ml-5 my-1 text-xs space-y-0.5">
+                                        <li>$E(X) = \lambda = \mathbf{5}$</li>
+                                        <li>$E(X^2) = \lambda(\lambda + 1) = \lambda^2 + \lambda = 25 + 5 = \mathbf{30}$</li>
+                                        <li>$E(X^3) = \lambda[(\lambda^2+\lambda) + (2\lambda+1)] = \lambda^3 + 3\lambda^2 + \lambda = 125 + 75 + 5 = \mathbf{205}$</li>
+                                        <li>$E(X^4) = \lambda[(\lambda^3+3\lambda^2+\lambda) + (3\lambda^2+6\lambda+1)] = \lambda^4 + 6\lambda^3 + 7\lambda^2 + \lambda = 625 + 750 + 175 + 5 = \mathbf{1555}$</li>
+                                    </ul>
+                                </li>
+                                <li>Calculamos varianzas y covarianza: $Var(X) = 5$, $Var(X^2) = 1555 - 30^2 = 655$, $Cov(X, X^2) = 205 - 5(30) = 55$.</li>
+                                <li>La constante $+2$ desaparece en la varianza:
+                                    $$Var(Y) = Var(X) + (-10)^2 Var(X^2) + 2(1)(-10)Cov(X, X^2) = 5 + 100(655) - 20(55) = 5 + 65.500 - 1.100 = \mathbf{64.405}$$
+                                </li>
                             </ol>
                             <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 font-medium">
-                                <strong>Resultado final:</strong> $Var(Y) = 64.405$.
+                                <strong>Resultado final:</strong> $Var(Y) = \mathbf{64.405}$.
                             </div>
                             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                                <p class="text-xs font-semibold text-slate-800"><i class="fa-solid fa-chart-area text-amber-600 mr-1"></i> Representación gráfica de la respuesta</p>
                                 <div class="bg-white rounded-lg border border-slate-200 p-2"><canvas id="chart-parc-r2-ex3" class="w-full h-44 block"></canvas></div>
+                                <p class="text-xs text-slate-600"><strong>Interpretación visual:</strong> Casi toda la varianza de $Y$ proviene del término cuadrático $100\,Var(X^2) = 65.500$; el término cruzado $-20\,Cov(X, X^2)$ descuenta $1.100$.</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                <div class="bg-sky-50/70 border border-sky-200 rounded-xl p-3.5 space-y-1">
+                                    <p class="font-bold text-sky-900"><i class="fa-solid fa-code-branch mr-1"></i> Otros posibles resultados ("¿Qué pasaría si...?")</p>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Si $Y$ fuera $X + 10X^2 + 2$ (con signo $+$), la covarianza sumaría $+1.100$, dando $Var(Y) = \mathbf{66.605}$.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 space-y-1">
+                                    <p class="font-bold text-rose-900"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Errores comunes a evitar</p>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li><strong>Evaluar $\lambda = 5$ antes de derivar:</strong> Si reemplazas $\lambda=5$ en $E(X^k)$ demasiado pronto, su derivada da $0$ y pierdes la recursión.</li>
+                                        <li><strong>Sumar $Var(2) = 2$</strong> o sacar $-10$ sin elevarlo al cuadrado ($100$).</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- EJ 4 -->
                 <div class="exercise-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" id="parc-r2-ex4">
                     <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
                         <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
@@ -5941,26 +6017,99 @@
                     </div>
                     <div class="p-5">
                         <div class="subtab-content enunciado space-y-2">
-                            <p class="text-sm text-slate-700 leading-relaxed">Con las salidas 2 a 7 de RCommander (Norte $n=50, ar{x}=94{,}64, S=15{,}05$; Sur $n=50, ar{x}=91{,}61, S=14{,}74$; Salida 7 año 2019: Norte $n=40, ar{x}=91{,}54$; Sur $n=27, ar{x}=79{,}48$):</p>
+                            <p class="text-sm text-slate-700 leading-relaxed">Con las salidas 2 a 7 de RCommander (Norte $n=50, \bar{x}=94{,}64, S=15{,}05$; Sur $n=50, \bar{x}=91{,}61, S=14{,}74$; Salida 7 año 2019: Norte $n=40, \bar{x}=91{,}54$; Sur $n=27, \bar{x}=79{,}48$):</p>
                             <ul class="text-sm list-disc list-inside text-slate-700 space-y-1">
-                                <li><strong>a)</strong> ¿Están relacionadas <code>metros</code> y <code>precio</code>? (Salida 6) (12,5 pts)</li>
+                                <li><strong>a)</strong> ¿Están relacionadas <code>metros</code> y <code>precio</code>? ¿Cuál sería esa relación? ¿Apoyan los datos esa relación? (Salida 6) (12,5 pts)</li>
                                 <li><strong>b)</strong> Estimar puntualmente la proporción en zona sur y su error. (15 pts)</li>
-                                <li><strong>c)</strong> IC al 95% para precio promedio en Norte y Sur. Comparar. (15 pts)</li>
-                                <li><strong>d)</strong> Índice de precios base 2019 (Salida 7), justificar y evaluar dichos del jefe. (12,5 pts)</li>
+                                <li><strong>c)</strong> IC al 95% para precio promedio en Norte y Sur. Comparar y aclarar supuestos. (15 pts)</li>
+                                <li><strong>d)</strong> Índice de precios base 2019 (Salida 7), justificar elección y evaluar los dichos del jefe. (12,5 pts)</li>
                             </ul>
                         </div>
                         <div class="subtab-content solucion hidden space-y-3 text-sm">
+                            <p class="font-semibold text-amber-700">Resolución Paso a Paso:</p>
                             <ol class="list-decimal list-inside space-y-1.5 text-slate-700">
-                                <li><strong>a)</strong> En la Salida 6 la nube de puntos está dispersa en todo el plano sin patrón creciente ni decreciente ($r pprox 0$): los datos <strong>no apoyan</strong> relación lineal entre <code>metros</code> y <code>precio</code>.</li>
-                                <li><strong>b)</strong> $\hat{p}_{	ext{sur}} = rac{50}{100} = \mathbf{0{,}50}$ ($50\%$), con $SE = \sqrt{rac{0{,}50 \cdot 0{,}50}{100}} = \mathbf{0{,}05}$ ($5\%$).</li>
-                                <li><strong>c)</strong> Con $n=50 \ge 30$ (TCL, $z=1{,}96$): Norte $= 94{,}64 \pm 1{,}96rac{15{,}05}{\sqrt{50}} = [\mathbf{90{,}47;\; 98{,}81}]$; Sur $= 91{,}61 \pm 1{,}96rac{14{,}74}{\sqrt{50}} = [\mathbf{87{,}52;\; 95{,}70}]$. Los intervalos se superponen casi por completo: no hay diferencia significativa.</li>
-                                <li><strong>d)</strong> Por el cambio de pesos ($n_{	ext{sur}}$ pasó de $27$ a $50$), usamos <strong>Paasche</strong>: $I_P = rac{94{,}64(50)+91{,}61(50)}{91{,}54(50)+79{,}48(50)}\cdot 100 = \mathbf{108{,}90}$ ($+8{,}90\%$ general; Sur subió $+15{,}26\%$ y Norte $+3{,}39\%$, apoyando parcialmente al jefe).</li>
+                                <li><strong>a)</strong> Teóricamente esperaríamos relación lineal positiva (más metros $\implies$ mayor precio). Sin embargo, en la Salida 6 los puntos cubren todo el rectángulo sin patrón creciente ni decreciente ($r \approx 0$): los datos <strong>no apoyan</strong> esa relación.</li>
+                                <li><strong>b)</strong> $\hat{p}_{\text{sur}} = \frac{50}{100} = \mathbf{0{,}50}$ ($50\%$), con error estándar $SE = \sqrt{\frac{0{,}50 \cdot 0{,}50}{100}} = \mathbf{0{,}05}$ ($5\%$).</li>
+                                <li><strong>c)</strong> Supuestos: muestras aleatorias simples e independientes y $n_i = 50 \ge 30$ (por <strong>TCL</strong> usamos $z_{0{,}975} = 1{,}96$):
+                                    <ul class="list-disc list-inside ml-5 my-1 text-xs space-y-0.5">
+                                        <li><strong>Norte:</strong> $94{,}64 \pm 1{,}96\frac{15{,}05}{\sqrt{50}} = 94{,}64 \pm 4{,}17 = [\mathbf{90{,}47\;;\; 98{,}81}]$</li>
+                                        <li><strong>Sur:</strong> $91{,}61 \pm 1{,}96\frac{14{,}74}{\sqrt{50}} = 91{,}61 \pm 4{,}09 = [\mathbf{87{,}52\;;\; 95{,}70}]$</li>
+                                    </ul>
+                                    Como ambos intervalos se superponen ampliamente, no hay evidencia de diferencia significativa al $95\%$.</li>
+                                <li><strong>d)</strong> Por el cambio en la composición de cantidades ($n_{\text{sur}}$ pasó de $27$ a $50$), usamos <strong>Paasche</strong>:
+                                    $$I_P = \frac{94{,}64(50) + 91{,}61(50)}{91{,}54(50) + 79{,}48(50)}\cdot 100 = \mathbf{108{,}90} \quad (+8{,}90\%)$$
+                                    Los datos apoyan al jefe: la zona Sur subió $+15{,}26\%$ ($79{,}48 \to 91{,}61$) y el nivel general subió $+8{,}90\%$ (Norte solo $+3{,}39\%$).</li>
                             </ol>
                             <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 font-medium">
                                 <strong>Resultado final:</strong> Sin relación lineal; $\hat{p}=0{,}50 \pm 0{,}05$; ICs superpuestos; Paasche $= 108{,}90$ ($+8{,}90\%$).
                             </div>
                             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                                <p class="text-xs font-semibold text-slate-800"><i class="fa-solid fa-chart-area text-amber-600 mr-1"></i> Representación gráfica de la respuesta</p>
                                 <div class="bg-white rounded-lg border border-slate-200 p-2"><canvas id="chart-parc-r2-ex4" class="w-full h-44 block"></canvas></div>
+                                <p class="text-xs text-slate-600"><strong>Interpretación visual:</strong> Los dos intervalos de confianza ($[90{,}47;\, 98{,}81]$ y $[87{,}52;\, 95{,}70]$) comparten toda la franja entre $90{,}47$ y $95{,}70$.</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                <div class="bg-sky-50/70 border border-sky-200 rounded-xl p-3.5 space-y-1">
+                                    <p class="font-bold text-sky-900"><i class="fa-solid fa-code-branch mr-1"></i> Otros posibles resultados ("¿Qué pasaría si...?")</p>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Si calcularas <strong>Laspeyres</strong> con las cantidades de 2019 ($40$ y $27$), daría $I_L = \mathbf{107{,}79}$ ($+7{,}79\%$).</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 space-y-1">
+                                    <p class="font-bold text-rose-900"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Errores comunes a evitar</p>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li><strong>No mencionar los supuestos</strong> en (c) (independencia y TCL con $n \ge 30$).</li>
+                                        <li><strong>Responder que sí hay relación en (a)</strong> por intuición teórica sin mirar la nube dispersa de la Salida 6.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EJ 5 (SALIDA EXTRA AGE / THEATRE) -->
+                <div class="exercise-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" id="parc-r2-ex5">
+                    <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+                        <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <span class="w-6 h-6 bg-amber-600 text-white rounded-full inline-flex items-center justify-center text-xs">+</span>
+                            Salida Extra (3ª Foto): Edad por Sexo y Correlación <code>log_Income</code> vs <code>Theatre</code>
+                        </span>
+                        <div class="flex rounded-lg bg-slate-200/80 p-1 text-xs">
+                            <button onclick="setExTab('parc-r2-ex5', 'enunciado')" class="subtab-btn active px-3 py-1 rounded-md font-medium transition">Enunciado y Salida</button>
+                            <button onclick="setExTab('parc-r2-ex5', 'solucion')" class="subtab-btn px-3 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition">Procedimiento y Solución</button>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="subtab-content enunciado space-y-2">
+                            <p class="text-sm text-slate-700 leading-relaxed">Con las salidas de RCommander de la 3ª imagen: <strong>Hombre</strong> ($n=309, \bar{x}=41{,}20, S=13{,}96, Me=42, Q_1=28, Q_3=53$, asim. $-0{,}0004$), <strong>Mujer</strong> ($n=390, \bar{x}=41{,}33, S=13{,}97, Me=42, Q_1=28, Q_3=54$, asim. $+0{,}035$), y <code>cor(log_Income, Theatre) = 0.3478</code>. Interpretar la comparación de edades y la correlación.</p>
+                        </div>
+                        <div class="subtab-content solucion hidden space-y-3 text-sm">
+                            <p class="font-semibold text-amber-700">Resolución Paso a Paso:</p>
+                            <ol class="list-decimal list-inside space-y-1.5 text-slate-700">
+                                <li><strong>Edades por Sexo:</strong> Ambas distribuciones son prácticamente <strong>idénticas y simétricas</strong> (medias $41{,}20$ vs $41{,}33$; medianas $42$; desvíos $13{,}96$ vs $13{,}97$; asimetría cercana a $0$; sin outliers y curtosis negativa $\approx -1{,}3$, es decir, platicúrtica / chata).</li>
+                                <li><strong>Correlación:</strong> $r = +0{,}3478$ indica una asociación lineal <strong>positiva débil a moderada</strong> entre el logaritmo del ingreso y el gasto/asistencia a teatro. En el gráfico se observa una nube muy dispersa con leve tendencia creciente y algunos puntos altos en <code>Theatre</code> ($> 400$).</li>
+                            </ol>
+                            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 font-medium">
+                                <strong>Resultado final:</strong> Sin diferencias de edad entre sexos (distribuciones simétricas y platicúrticas); correlación positiva débil-moderada ($r = +0{,}3478$).
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                                <p class="text-xs font-semibold text-slate-800"><i class="fa-solid fa-chart-area text-amber-600 mr-1"></i> Representación gráfica de la respuesta</p>
+                                <div class="bg-white rounded-lg border border-slate-200 p-2"><canvas id="chart-parc-r2-ex5" class="w-full h-44 block"></canvas></div>
+                                <p class="text-xs text-slate-600"><strong>Interpretación visual:</strong> Los boxplots de Hombre y Mujer se superponen casi al milímetro en posición, caja y bigotes.</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                <div class="bg-sky-50/70 border border-sky-200 rounded-xl p-3.5 space-y-1">
+                                    <p class="font-bold text-sky-900"><i class="fa-solid fa-code-branch mr-1"></i> Otros posibles resultados ("¿Qué pasaría si...?")</p>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Si pidieran un IC $95\%$ de la edad media en Mujeres ($n=390$): $41{,}33 \pm 1{,}96\frac{13{,}97}{\sqrt{390}} = [\mathbf{39{,}94;\; 42{,}72}]$.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 space-y-1">
+                                    <p class="font-bold text-rose-900"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Errores comunes a evitar</p>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li><strong>Confundir $r = 0{,}35$ con "correlación fuerte":</strong> Explica apenas $r^2 \approx 12\%$ de la variabilidad lineal.</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -8977,6 +9126,14 @@
                 intervals: [
                     { label: 'Zona Norte', low: 90.47, mid: 94.64, high: 98.81, color: '#0284c7' },
                     { label: 'Zona Sur', low: 87.52, mid: 91.61, high: 95.70, color: '#d97706' }
+                ]
+            },
+            'chart-parc-r2-ex5': {
+                type: 'boxplot', xMin: 15, xMax: 68, ticks: [18, 28, 42, 54, 64],
+                title: 'Comparación de Edad (Age) por Sexo',
+                boxes: [
+                    { label: 'Hombre (n=309)', min: 18, q1: 28, med: 42, q3: 53, max: 64, mean: 41.20, color: '#0284c7' },
+                    { label: 'Mujer (n=390)', min: 18, q1: 28, med: 42, q3: 54, max: 64, mean: 41.33, color: '#e11d48' }
                 ]
             }
         });
