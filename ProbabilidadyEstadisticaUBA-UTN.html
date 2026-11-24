@@ -59,6 +59,32 @@
             background-color: #f8fafc;
             border-left: 4px solid #0284c7;
         }
+        @keyframes slideReveal {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .animate-slide-in {
+            animation: slideReveal 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-modal-slide {
+            animation: modalSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-full font-sans text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
@@ -6543,6 +6569,13 @@
             if (active) drawVisibleSolutionCharts(active);
         });
 
+        function triggerSlide(el, cls = 'animate-slide-in') {
+            if (!el) return;
+            el.classList.remove(cls);
+            void el.offsetWidth;
+            el.classList.add(cls);
+        }
+
         // Cambio de Pestaña Principal (Tema 1, 2, 3, 4)
         function switchMainTab(tabId) {
             // Ocultar todos los contenidos de pestaña principal
@@ -6555,7 +6588,9 @@
             });
 
             // Mostrar el seleccionado y activar su botón
-            document.getElementById(tabId).classList.remove('hidden');
+            const targetSec = document.getElementById(tabId);
+            targetSec.classList.remove('hidden');
+            triggerSlide(targetSec);
             document.getElementById(tabId + '-btn').classList.add('active');
 
             // Renderizar fórmulas nuevamente si fuera necesario
@@ -7433,6 +7468,7 @@
 
                 contentEnunciado.classList.remove('hidden');
                 contentSolucion.classList.add('hidden');
+                triggerSlide(contentEnunciado);
             } else {
                 btnSolucion.classList.add('active');
                 btnSolucion.classList.remove('text-slate-600');
@@ -7441,6 +7477,7 @@
 
                 contentSolucion.classList.remove('hidden');
                 contentEnunciado.classList.add('hidden');
+                triggerSlide(contentSolucion);
                 drawVisibleSolutionCharts(contentSolucion);
             }
         }
@@ -7477,7 +7514,10 @@
 
         // Modal Controls
         function openModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            const panel = modal.firstElementChild;
+            if (panel) triggerSlide(panel, 'animate-modal-slide');
         }
 
         function closeModal(modalId) {
@@ -7755,7 +7795,9 @@
                 b.classList.remove('active', 'bg-white', 'text-brand-700', 'border-slate-200');
                 b.classList.add('border-transparent', 'text-slate-600');
             });
-            document.getElementById(tabId).classList.remove('hidden');
+            const tblPanel = document.getElementById(tabId);
+            tblPanel.classList.remove('hidden');
+            triggerSlide(tblPanel);
             const btn = document.getElementById('btn-' + tabId);
             btn.classList.add('active', 'bg-white', 'text-brand-700', 'border-slate-200');
             btn.classList.remove('border-transparent', 'text-slate-600');
