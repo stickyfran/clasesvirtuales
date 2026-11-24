@@ -92,15 +92,15 @@
     <!-- HEADER & NAVBAR -->
     <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-brand-500 text-white p-2.5 rounded-xl shadow-inner">
+            <button type="button" onclick="switchChapter('cap1', 'cap1Tab')" title="Ir al Índice de Estadística" class="flex items-center gap-3 text-left group cursor-pointer focus:outline-none">
+                <div class="bg-brand-500 group-hover:bg-brand-400 text-white p-2.5 rounded-xl shadow-inner transition">
                     <i class="fa-solid me-0 fa-chart-line text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight sm:text-xl">Análisis Estadístico I</h1>
+                    <h1 class="font-bold text-lg leading-tight sm:text-xl group-hover:text-brand-200 transition">Análisis Estadístico I</h1>
                     <p id="activeChapterSubtitle" class="text-xs text-slate-400">Prof. Franco Muscó • Índice de Contenidos</p>
                 </div>
-            </div>
+            </button>
 
             <div class="flex items-center gap-2.5 flex-wrap">
                 <button onclick="openChapterDrawer()" class="inline-flex items-center gap-2 px-3.5 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs sm:text-sm font-semibold transition shadow-sm border border-brand-400/40">
@@ -2157,25 +2157,82 @@
                     Este espacio está reservado para los contenidos iniciales de la materia (<strong>Temas 1 a 4</strong>): Axiomas de Probabilidad, Probabilidad Condicional y Teorema de Bayes, Variables Aleatorias Discretas y Continuas generales (Binomial, Poisson, Hipergeométrica, Exponencial, Gamma). Mientras tanto, ya puedes navegar todo el resto del programa desde el menú lateral derecho.
                 </p>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <!-- Bloque 1: Cap 1 -->
                     <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-1.5">
-                        <span class="text-xs font-bold text-slate-500 uppercase">Bloque 1 (En preparación)</span>
-                        <h3 class="font-bold text-slate-900 text-sm">Temas 1 a 4: Fundamentos de Probabilidad</h3>
-                        <p class="text-xs text-slate-600">Espacios muestrales, Bayes, esperanza, varianza, Binomial, Poisson, Exponencial y Gamma.</p>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Bloque 1 • Cap. 1 (En preparación)</span>
+                        <h3 class="font-bold text-slate-900 text-sm">Temas 1 a 4 + Primer Parcial</h3>
+                        <p class="text-xs text-slate-600">Espacios muestrales, Bayes, esperanza, varianza, Binomial, Poisson, Exponencial, Gamma y ejercitación del <strong>Primer Parcial</strong>.</p>
                     </div>
-                    <div class="bg-sky-50 border border-sky-200 rounded-xl p-4 space-y-2">
-                        <span class="text-xs font-bold text-sky-700 uppercase">Bloque 2 (Disponible)</span>
-                        <h3 class="font-bold text-slate-900 text-sm">Cap. 2 (Tema 5) y Cap. 3–4 (Temas 6–7)</h3>
-                        <p class="text-xs text-slate-600">Normal, $\chi^2$, $T$, $F$, Análisis Exploratorio (EDA), Correlación y Números Índices.</p>
-                        <button onclick="switchChapter('cap2', 'normalTab')" class="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-sky-700 hover:text-sky-900">
+
+                    <!-- Cap 2 -->
+                    <div class="bg-sky-50 border border-sky-200 rounded-xl p-4 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold text-sky-700 uppercase">Cap. 2 • Tema 5</span>
+                            <h3 class="font-bold text-slate-900 text-sm">Distribución Normal y Derivadas</h3>
+                            <p class="text-xs text-slate-600">Normal $N(\mu;\sigma^2)$, Chi-Cuadrado ($\chi^2$), $T$ de Student y $F$ de Snedecor.</p>
+                        </div>
+                        <button onclick="switchChapter('cap2', 'normalTab')" class="self-start mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-sky-700 hover:text-sky-900">
                             Ir al Capítulo 2 <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
-                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-2">
-                        <span class="text-xs font-bold text-rose-700 uppercase">Bloque 3 (Disponible)</span>
-                        <h3 class="font-bold text-slate-900 text-sm">Cap. 5–7: Inferencia y Segundo Parcial</h3>
-                        <p class="text-xs text-slate-600">Estimación puntual, TCL, Intervalos de Confianza, Test de Hipótesis y Simulacros.</p>
-                        <button onclick="switchChapter('cap7', 'parcialRealTab')" class="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 hover:text-rose-900">
+
+                    <!-- Cap 3 -->
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold text-indigo-700 uppercase">Cap. 3 • Tema 6</span>
+                            <h3 class="font-bold text-slate-900 text-sm">EDA y Correlación</h3>
+                            <p class="text-xs text-slate-600">Medidas resumen, Histograma, Boxplot de Tukey, Covarianza y Pearson ($r$).</p>
+                        </div>
+                        <button onclick="switchChapter('cap3', 'edaResumenTab')" class="self-start mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 hover:text-indigo-900">
+                            Ir al Capítulo 3 <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Cap 4 -->
+                    <div class="bg-cyan-50 border border-cyan-200 rounded-xl p-4 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold text-cyan-700 uppercase">Cap. 4 • Tema 7</span>
+                            <h3 class="font-bold text-slate-900 text-sm">Números Índices</h3>
+                            <p class="text-xs text-slate-600">Laspeyres, Paasche, Fisher, Índice de Valor, Deflactación y Cambio de Base.</p>
+                        </div>
+                        <button onclick="switchChapter('cap4', 'indicesCompTab')" class="self-start mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-700 hover:text-cyan-900">
+                            Ir al Capítulo 4 <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Cap 5 -->
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold text-rose-700 uppercase">Cap. 5 • Tema 8</span>
+                            <h3 class="font-bold text-slate-900 text-sm">Inferencia y Estimación Puntual</h3>
+                            <p class="text-xs text-slate-600">Muestreo, LGN, sesgo, eficiencia relativa, $EMC$ y consistencia.</p>
+                        </div>
+                        <button onclick="switchChapter('cap5', 'infIntroTab')" class="self-start mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 hover:text-rose-900">
+                            Ir al Capítulo 5 <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Cap 6 -->
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold text-emerald-700 uppercase">Cap. 6 • Tema 9</span>
+                            <h3 class="font-bold text-slate-900 text-sm">Distribuciones Muestrales e IC</h3>
+                            <p class="text-xs text-slate-600">TCL, Intervalos de Confianza ($\mu$, $\sigma^2$, $p$) y tamaño de muestra ($n$).</p>
+                        </div>
+                        <button onclick="switchChapter('cap6', 'distMuestralTab')" class="self-start mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-900">
+                            Ir al Capítulo 6 <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Cap 7 -->
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2 flex flex-col justify-between md:col-span-2 lg:col-span-3">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold text-amber-800 uppercase">Cap. 7 • Exámenes</span>
+                            <h3 class="font-bold text-slate-900 text-sm">Ejercitación de Segundo Parcial (2 Reales + 2 Simulacros)</h3>
+                            <p class="text-xs text-slate-600">Parciales reales fotografiados con salidas RCommander/Excel, Test de Hipótesis, p-valor, Potencia y 2 Simulacros completos de 100 pts.</p>
+                        </div>
+                        <button onclick="switchChapter('cap7', 'parcialRealTab')" class="self-start mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 hover:text-amber-950">
                             Ir a Ejercitación de Parcial <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
