@@ -15979,6 +15979,35 @@
                         </div>
                     </div>
                 </div>
+                <div class="mt-5 pt-4 border-t border-slate-200">
+                    <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4">
+                        <h4 class="font-bold text-amber-900 text-sm mb-2.5 flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-amber-600"></i> Repaso Express: Todos los ítems del Segundo Parcial Real 1
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs text-slate-700">
+                            <div class="bg-white rounded-lg p-2.5 border border-amber-100">
+                                <p class="font-bold text-amber-900">1. Dataset Pizzería — BILL (40 pts)</p>
+                                <p>Compará $\bar{x}$ vs. $Me$ y aplicá Tukey ($Q_3+1{,}5\cdot IQR$) para elegir resumen ($Me+IQR$ si hay asimetría/outliers). Para el IC con $n \ge 30$, usá $Z$ con $SE = S/\sqrt{n}$.</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-2.5 border border-amber-100">
+                                <p class="font-bold text-amber-900">2. Índices — Minería y Energía</p>
+                                <p>Si cambió fuerte la estructura de cantidades actuales $q_1$ respecto de $q_0$, Laspeyres queda desactualizado y corresponde <strong>Paasche</strong>: $I_P = \frac{\sum p_1 q_1}{\sum p_0 q_1}\cdot 100$.</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-2.5 border border-amber-100">
+                                <p class="font-bold text-amber-900">3. Estimador en Gamma</p>
+                                <p>Si $X_i \sim \text{Gamma}(\alpha;\,\beta)$ indep., $\sum X_i \sim \text{Gamma}(n\alpha;\,\beta)$ y multiplicar por una constante $c &gt; 0$ escala $\beta \to c\beta$.</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-2.5 border border-amber-100">
+                                <p class="font-bold text-amber-900">4. Nivel de Confianza desde IC</p>
+                                <p>Extraé la semiamplitud $E = (LS-LI)/2$, calculá $z = E/SE$ y buscá el área central $\Phi(z)-\Phi(-z)$ en la tabla Normal.</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-2.5 border border-amber-100 md:col-span-2 lg:col-span-2">
+                                <p class="font-bold text-amber-900">5. Test de Proporción + Potencia ($1-\beta$)</p>
+                                <p>Calculá $Z_{obs}$ bajo $p_0$ y el p-valor en la cola de $H_1$. Para Potencia en $p_1$: ① fijá la frontera crítica $p_{\text{crit}}$ con $SE_0$; ② recalculá $SE_1 = \sqrt{p_1(1-p_1)/n}$; ③ evaluá la misma cola de rechazo bajo $p_1$.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- HEADER EJERCICIOS PARCIAL REAL -->
@@ -16001,6 +16030,7 @@
                             <span class="w-6 h-6 bg-amber-600 text-white rounded-full inline-flex items-center justify-center text-xs">1</span>
                             Dataset Pizzería — Variable BILL (40 puntos)
                         </span>
+                        <span class="relative inline-block group"><button type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-900 border-amber-200 transition cursor-help focus:outline-none"><i class="fa-solid fa-circle-question text-[10px]"></i><span>¿Cómo se encara?</span></button><span role="tooltip" class="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-all duration-150 absolute right-0 bottom-full mb-2 w-72 max-w-[calc(100vw-2rem)] p-3 rounded-xl bg-slate-900 text-slate-100 text-[11px] font-normal leading-relaxed shadow-2xl border border-slate-700 z-30 pointer-events-none text-left whitespace-normal"><span class="block font-bold text-amber-300 mb-1">Cómo encarar: Dataset Pizzería (BILL)</span><span class="block text-slate-200">1) Mirá $\bar{x}$ vs $Me$ y aplicá Tukey ($Q_3+1{,}5\cdot IQR$) para decidir si resumís con $Me+IQR$. 2) Para el IC con $n \ge 30$, usá Normal $Z$ ($z=1{,}96$) y $SE = S/\sqrt{n}$.</span></span></span>
                         <div class="flex rounded-lg bg-slate-200/80 p-1 text-xs">
                             <button onclick="setExTab('parc-r-ex1', 'enunciado')" class="subtab-btn active px-3 py-1 rounded-md font-medium transition">Enunciado y Salidas</button>
                             <button onclick="setExTab('parc-r-ex1', 'solucion')" class="subtab-btn px-3 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition">Procedimiento y Solución</button>
@@ -16165,6 +16195,7 @@
                             <span class="w-6 h-6 bg-amber-600 text-white rounded-full inline-flex items-center justify-center text-xs">2</span>
                             Números Índices — Sector Minería y Energía (15 puntos)
                         </span>
+                        <span class="relative inline-block group"><button type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-900 border-amber-200 transition cursor-help focus:outline-none"><i class="fa-solid fa-circle-question text-[10px]"></i><span>¿Cómo se encara?</span></button><span role="tooltip" class="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-all duration-150 absolute right-0 bottom-full mb-2 w-72 max-w-[calc(100vw-2rem)] p-3 rounded-xl bg-slate-900 text-slate-100 text-[11px] font-normal leading-relaxed shadow-2xl border border-slate-700 z-30 pointer-events-none text-left whitespace-normal"><span class="block font-bold text-amber-300 mb-1">Cómo encarar: Índices Minería y Energía</span><span class="block text-slate-200">Detectá si las cantidades actuales $q_1$ cambiaron fuerte respecto del año base $q_0$. En ese caso Laspeyres queda viejo y se usa <strong>Paasche</strong>: $I_P = \frac{\sum p_1 q_1}{\sum p_0 q_1}\cdot 100$.</span></span></span>
                         <div class="flex rounded-lg bg-slate-200/80 p-1 text-xs">
                             <button onclick="setExTab('parc-r-ex2', 'enunciado')" class="subtab-btn active px-3 py-1 rounded-md font-medium transition">Enunciado</button>
                             <button onclick="setExTab('parc-r-ex2', 'solucion')" class="subtab-btn px-3 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition">Procedimiento y Solución</button>
@@ -16300,6 +16331,7 @@
                             <span class="w-6 h-6 bg-amber-600 text-white rounded-full inline-flex items-center justify-center text-xs">3</span>
                             Distribución Muestral de un Estimador en Gamma (10 puntos)
                         </span>
+                        <span class="relative inline-block group"><button type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-900 border-amber-200 transition cursor-help focus:outline-none"><i class="fa-solid fa-circle-question text-[10px]"></i><span>¿Cómo se encara?</span></button><span role="tooltip" class="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-all duration-150 absolute right-0 bottom-full mb-2 w-72 max-w-[calc(100vw-2rem)] p-3 rounded-xl bg-slate-900 text-slate-100 text-[11px] font-normal leading-relaxed shadow-2xl border border-slate-700 z-30 pointer-events-none text-left whitespace-normal"><span class="block font-bold text-amber-300 mb-1">Cómo encarar: Distribución en Gamma</span><span class="block text-slate-200">Usá las dos propiedades de Gamma: la suma de $n$ independientes multiplica la forma ($\alpha \to n\alpha$) y multiplicar por una constante $c$ escala el parámetro $\beta \to c\beta$.</span></span></span>
                         <div class="flex rounded-lg bg-slate-200/80 p-1 text-xs">
                             <button onclick="setExTab('parc-r-ex3', 'enunciado')" class="subtab-btn active px-3 py-1 rounded-md font-medium transition">Enunciado</button>
                             <button onclick="setExTab('parc-r-ex3', 'solucion')" class="subtab-btn px-3 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition">Procedimiento y Solución</button>
@@ -16421,6 +16453,7 @@
                             <span class="w-6 h-6 bg-amber-600 text-white rounded-full inline-flex items-center justify-center text-xs">4</span>
                             Determinación del Nivel de Confianza (15 puntos)
                         </span>
+                        <span class="relative inline-block group"><button type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-900 border-amber-200 transition cursor-help focus:outline-none"><i class="fa-solid fa-circle-question text-[10px]"></i><span>¿Cómo se encara?</span></button><span role="tooltip" class="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-all duration-150 absolute right-0 bottom-full mb-2 w-72 max-w-[calc(100vw-2rem)] p-3 rounded-xl bg-slate-900 text-slate-100 text-[11px] font-normal leading-relaxed shadow-2xl border border-slate-700 z-30 pointer-events-none text-left whitespace-normal"><span class="block font-bold text-amber-300 mb-1">Cómo encarar: Nivel de Confianza</span><span class="block text-slate-200">Del intervalo $[LI;\; LS]$ sacá el margen $E = (LS-LI)/2$. Dividí $z = E/SE$ y buscá el área central $\Phi(z)-\Phi(-z)$ en la tabla Normal.</span></span></span>
                         <div class="flex rounded-lg bg-slate-200/80 p-1 text-xs">
                             <button onclick="setExTab('parc-r-ex4', 'enunciado')" class="subtab-btn active px-3 py-1 rounded-md font-medium transition">Enunciado</button>
                             <button onclick="setExTab('parc-r-ex4', 'solucion')" class="subtab-btn px-3 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition">Procedimiento y Solución</button>
@@ -16542,6 +16575,7 @@
                             <span class="w-6 h-6 bg-amber-600 text-white rounded-full inline-flex items-center justify-center text-xs">5</span>
                             Test de Hipótesis de Proporción, p-valor y Potencia (20 puntos)
                         </span>
+                        <span class="relative inline-block group"><button type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-900 border-amber-200 transition cursor-help focus:outline-none"><i class="fa-solid fa-circle-question text-[10px]"></i><span>¿Cómo se encara?</span></button><span role="tooltip" class="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-all duration-150 absolute right-0 bottom-full mb-2 w-72 max-w-[calc(100vw-2rem)] p-3 rounded-xl bg-slate-900 text-slate-100 text-[11px] font-normal leading-relaxed shadow-2xl border border-slate-700 z-30 pointer-events-none text-left whitespace-normal"><span class="block font-bold text-amber-300 mb-1">Cómo encarar: Test Proporción + Potencia</span><span class="block text-slate-200">Calculá $Z_{obs}$ bajo $p_0$ y el p-valor en la cola de $H_1$. Para Potencia en $p_1$: fijá $p_{\text{crit}}$ con $SE_0$, recalculá $SE_1 = \sqrt{p_1(1-p_1)/n}$ y medí la probabilidad en la misma cola bajo $p_1$.</span></span></span>
                         <div class="flex rounded-lg bg-slate-200/80 p-1 text-xs">
                             <button onclick="setExTab('parc-r-ex5', 'enunciado')" class="subtab-btn active px-3 py-1 rounded-md font-medium transition">Enunciado</button>
                             <button onclick="setExTab('parc-r-ex5', 'solucion')" class="subtab-btn px-3 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition">Procedimiento y Solución</button>
