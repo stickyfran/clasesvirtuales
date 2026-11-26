@@ -21890,12 +21890,119 @@
 
     </script>
 
-    <!-- BOTÓN Y PANEL FLOTANTE DE FÓRMULAS CLAVE -->
-    <button id="floatingFormulaBtn" onclick="toggleFormulaDrawer()" type="button"
-        class="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-900 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-2xl border border-slate-700 transition-all duration-200 hover:scale-105 cursor-pointer">
-        <i class="fa-solid fa-square-root-variable text-amber-400"></i>
-        <span>Fórmulas Clave</span>
-    </button>
+    <!-- BOTONES Y PANELES FLOTANTES (TABLAS Y FÓRMULAS CLAVE) -->
+    <div class="fixed bottom-5 right-5 z-40 flex items-center gap-2.5">
+        <button id="floatingTablesBtn" onclick="toggleTablesDrawer()" type="button"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold shadow-2xl border border-emerald-500 transition-all duration-200 hover:scale-105 cursor-pointer">
+            <i class="fa-solid fa-table text-emerald-200"></i>
+            <span>Tablas</span>
+        </button>
+        <button id="floatingFormulaBtn" onclick="toggleFormulaDrawer()" type="button"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-900 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-2xl border border-slate-700 transition-all duration-200 hover:scale-105 cursor-pointer">
+            <i class="fa-solid fa-square-root-variable text-amber-400"></i>
+            <span>Fórmulas Clave</span>
+        </button>
+    </div>
+
+    <div id="floatingTablesDrawer" class="hidden fixed bottom-20 right-5 z-50 w-[calc(100vw-2.5rem)] max-w-2xl max-h-[78vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-slate-200 text-slate-800">
+        <div class="sticky top-0 z-10 bg-emerald-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-table text-emerald-300"></i>
+                <span class="font-bold text-sm">Tablas Estadísticas Rápidas ($Z, T, \chi^2, F$)</span>
+            </div>
+            <button onclick="toggleTablesDrawer(false)" type="button" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white inline-flex items-center justify-center transition cursor-pointer" aria-label="Cerrar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-1.5 text-[11px] font-semibold">
+            <button type="button" onclick="filterTableTab('tabZ', this)" class="table-tab-btn px-2.5 py-1 rounded-full bg-emerald-800 text-white cursor-pointer">Normal $Z$</button>
+            <button type="button" onclick="filterTableTab('tabT', this)" class="table-tab-btn px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Student $T_k$</button>
+            <button type="button" onclick="filterTableTab('tabChi', this)" class="table-tab-btn px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Chi-Cuadrado $\chi^2_k$</button>
+            <button type="button" onclick="filterTableTab('tabF', this)" class="table-tab-btn px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Fisher $F$</button>
+        </div>
+        <div class="p-4 text-xs space-y-3">
+            <div id="tabZ" class="table-tab-pane space-y-2.5">
+                <p class="font-bold text-slate-900">Cuantiles críticos de $Z \sim N(0;1)$ (más usados en IC y Test):</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse border border-slate-200 rounded-lg">
+                        <thead class="bg-slate-100 text-slate-700">
+                            <tr><th class="p-2 border border-slate-200">Confianza / Caso</th><th class="p-2 border border-slate-200">$\Phi(z)$</th><th class="p-2 border border-slate-200">$z$</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="p-2 border border-slate-200">$Q_3$ (percentil 75)</td><td class="p-2 border border-slate-200">$0{,}750$</td><td class="p-2 border border-slate-200 font-bold">$0{,}6745$</td></tr>
+                            <tr><td class="p-2 border border-slate-200">IC $90\%$ / Test $5\%$ unilat.</td><td class="p-2 border border-slate-200">$0{,}950$</td><td class="p-2 border border-slate-200 font-bold">$1{,}645$</td></tr>
+                            <tr><td class="p-2 border border-slate-200">IC $95\%$ / Test $2{,}5\%$ unilat.</td><td class="p-2 border border-slate-200">$0{,}975$</td><td class="p-2 border border-slate-200 font-bold">$1{,}960$</td></tr>
+                            <tr><td class="p-2 border border-slate-200">Test $1\%$ unilat.</td><td class="p-2 border border-slate-200">$0{,}990$</td><td class="p-2 border border-slate-200 font-bold">$2{,}326$</td></tr>
+                            <tr><td class="p-2 border border-slate-200">IC $99\%$ / Test $0{,}5\%$ unilat.</td><td class="p-2 border border-slate-200">$0{,}995$</td><td class="p-2 border border-slate-200 font-bold">$2{,}576$</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="font-bold text-slate-900 pt-1">Valores acumulados $\Phi(z) = P(Z \le z)$ (para $z &lt; 0$: $\Phi(-z) = 1 - \Phi(z)$):</p>
+                <div class="grid grid-cols-3 sm:grid-cols-4 gap-1.5 text-[11px]">
+                    <div class="bg-slate-50 border border-slate-200 rounded p-1.5">$z=0{,}5 \to 0{,}6915$</div>
+                    <div class="bg-slate-50 border border-slate-200 rounded p-1.5">$z=0{,}9 \to 0{,}8159$</div>
+                    <div class="bg-slate-50 border border-slate-200 rounded p-1.5">$z=1{,}0 \to 0{,}8413$</div>
+                    <div class="bg-slate-50 border border-slate-200 rounded p-1.5">$z=1{,}28 \to 0{,}9000$</div>
+                    <div class="bg-slate-50 border border-slate-200 rounded p-1.5">$z=1{,}5 \to 0{,}9332$</div>
+                    <div class="bg-slate-50 border border-slate-200 rounded p-1.5">$z=2{,}0 \to 0{,}9772$</div>
+                    <div class="bg-slate-50 border border-slate-200 rounded p-1.5">$z=2{,}5 \to 0{,}9938$</div>
+                    <div class="bg-slate-50 border border-slate-200 rounded p-1.5">$z=3{,}0 \to 0{,}9987$</div>
+                </div>
+            </div>
+            <div id="tabT" class="table-tab-pane hidden space-y-2">
+                <p class="font-bold text-slate-900">Percentiles $t_{p;\, k}$ de Student ($P(T_k \le t) = p$):</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse border border-slate-200">
+                        <thead class="bg-slate-100 text-slate-700">
+                            <tr><th class="p-1.5 border border-slate-200">$k$ (gl)</th><th class="p-1.5 border border-slate-200">$0{,}90$</th><th class="p-1.5 border border-slate-200">$0{,}95$</th><th class="p-1.5 border border-slate-200">$0{,}975$</th><th class="p-1.5 border border-slate-200">$0{,}99$</th><th class="p-1.5 border border-slate-200">$0{,}995$</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">5</td><td class="p-1.5 border border-slate-200">1,476</td><td class="p-1.5 border border-slate-200">2,015</td><td class="p-1.5 border border-slate-200">2,571</td><td class="p-1.5 border border-slate-200">3,365</td><td class="p-1.5 border border-slate-200">4,032</td></tr>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">9</td><td class="p-1.5 border border-slate-200">1,383</td><td class="p-1.5 border border-slate-200">1,833</td><td class="p-1.5 border border-slate-200">2,262</td><td class="p-1.5 border border-slate-200">2,821</td><td class="p-1.5 border border-slate-200">3,250</td></tr>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">15</td><td class="p-1.5 border border-slate-200">1,341</td><td class="p-1.5 border border-slate-200">1,753</td><td class="p-1.5 border border-slate-200">2,131</td><td class="p-1.5 border border-slate-200">2,602</td><td class="p-1.5 border border-slate-200">2,947</td></tr>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">24</td><td class="p-1.5 border border-slate-200">1,318</td><td class="p-1.5 border border-slate-200">1,711</td><td class="p-1.5 border border-slate-200">2,064</td><td class="p-1.5 border border-slate-200">2,492</td><td class="p-1.5 border border-slate-200">2,797</td></tr>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">$\infty$ ($Z$)</td><td class="p-1.5 border border-slate-200">1,282</td><td class="p-1.5 border border-slate-200">1,645</td><td class="p-1.5 border border-slate-200">1,960</td><td class="p-1.5 border border-slate-200">2,326</td><td class="p-1.5 border border-slate-200">2,576</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="tabChi" class="table-tab-pane hidden space-y-2">
+                <p class="font-bold text-slate-900">Percentiles $\chi^2_{p;\, k}$ ($P(\chi^2_k \le x) = p$):</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse border border-slate-200">
+                        <thead class="bg-slate-100 text-slate-700">
+                            <tr><th class="p-1.5 border border-slate-200">$k$ (gl)</th><th class="p-1.5 border border-slate-200">$0{,}025$</th><th class="p-1.5 border border-slate-200">$0{,}05$</th><th class="p-1.5 border border-slate-200">$0{,}95$</th><th class="p-1.5 border border-slate-200">$0{,}975$</th><th class="p-1.5 border border-slate-200">$0{,}99$</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">8</td><td class="p-1.5 border border-slate-200">2,180</td><td class="p-1.5 border border-slate-200">2,733</td><td class="p-1.5 border border-slate-200">15,507</td><td class="p-1.5 border border-slate-200">17,535</td><td class="p-1.5 border border-slate-200">20,090</td></tr>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">10</td><td class="p-1.5 border border-slate-200">3,247</td><td class="p-1.5 border border-slate-200">3,940</td><td class="p-1.5 border border-slate-200">18,307</td><td class="p-1.5 border border-slate-200">20,483</td><td class="p-1.5 border border-slate-200">23,209</td></tr>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">12</td><td class="p-1.5 border border-slate-200">4,404</td><td class="p-1.5 border border-slate-200">5,226</td><td class="p-1.5 border border-slate-200">21,026</td><td class="p-1.5 border border-slate-200">23,337</td><td class="p-1.5 border border-slate-200">26,217</td></tr>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">15</td><td class="p-1.5 border border-slate-200">6,262</td><td class="p-1.5 border border-slate-200">7,261</td><td class="p-1.5 border border-slate-200">24,996</td><td class="p-1.5 border border-slate-200">27,488</td><td class="p-1.5 border border-slate-200">30,578</td></tr>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">24</td><td class="p-1.5 border border-slate-200">12,401</td><td class="p-1.5 border border-slate-200">13,848</td><td class="p-1.5 border border-slate-200">36,415</td><td class="p-1.5 border border-slate-200">39,364</td><td class="p-1.5 border border-slate-200">42,980</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="tabF" class="table-tab-pane hidden space-y-2">
+                <p class="font-bold text-slate-900">Valores críticos $F_{0{,}95}(d_1;\; d_2)$ (cola derecha $5\%$):</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse border border-slate-200">
+                        <thead class="bg-slate-100 text-slate-700">
+                            <tr><th class="p-1.5 border border-slate-200">$d_2 \backslash d_1$</th><th class="p-1.5 border border-slate-200">4</th><th class="p-1.5 border border-slate-200">5</th><th class="p-1.5 border border-slate-200">9</th><th class="p-1.5 border border-slate-200">12</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">5</td><td class="p-1.5 border border-slate-200">5,19</td><td class="p-1.5 border border-slate-200">5,05</td><td class="p-1.5 border border-slate-200">4,77</td><td class="p-1.5 border border-slate-200">4,68</td></tr>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">9</td><td class="p-1.5 border border-slate-200">3,63</td><td class="p-1.5 border border-slate-200">3,48</td><td class="p-1.5 border border-slate-200">3,18</td><td class="p-1.5 border border-slate-200">3,07</td></tr>
+                            <tr><td class="p-1.5 border border-slate-200 font-bold">12</td><td class="p-1.5 border border-slate-200">3,26</td><td class="p-1.5 border border-slate-200">3,11</td><td class="p-1.5 border border-slate-200">2,80</td><td class="p-1.5 border border-slate-200">2,69</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-[11px] bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-emerald-900">
+                    <strong>Regla de inversión:</strong> $F_{0{,}05}(d_1;\,d_2) = \frac{1}{F_{0{,}95}(d_2;\,d_1)}$ (recordá dar vuelta $d_1$ y $d_2$!).
+                </p>
+            </div>
+        </div>
+    </div>
 
     <div id="floatingFormulaDrawer" class="hidden fixed bottom-20 right-5 z-50 w-[calc(100vw-2.5rem)] max-w-2xl max-h-[78vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-slate-200 text-slate-800">
         <div class="sticky top-0 z-10 bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between gap-2">
@@ -21953,8 +22060,10 @@
     <script>
         function toggleFormulaDrawer(forceState) {
             const drawer = document.getElementById('floatingFormulaDrawer');
+            const tables = document.getElementById('floatingTablesDrawer');
             if (!drawer) return;
             const shouldOpen = typeof forceState === 'boolean' ? forceState : drawer.classList.contains('hidden');
+            if (shouldOpen && tables) tables.classList.add('hidden');
             drawer.classList.toggle('hidden', !shouldOpen);
             if (shouldOpen && !drawer.dataset.katexDone && typeof renderMathInElement === 'function') {
                 renderMathInElement(drawer, {
@@ -21963,6 +22072,30 @@
                 });
                 drawer.dataset.katexDone = '1';
             }
+        }
+        function toggleTablesDrawer(forceState) {
+            const drawer = document.getElementById('floatingTablesDrawer');
+            const formulas = document.getElementById('floatingFormulaDrawer');
+            if (!drawer) return;
+            const shouldOpen = typeof forceState === 'boolean' ? forceState : drawer.classList.contains('hidden');
+            if (shouldOpen && formulas) formulas.classList.add('hidden');
+            drawer.classList.toggle('hidden', !shouldOpen);
+            if (shouldOpen && !drawer.dataset.katexDone && typeof renderMathInElement === 'function') {
+                renderMathInElement(drawer, {
+                    delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}],
+                    throwOnError: false
+                });
+                drawer.dataset.katexDone = '1';
+            }
+        }
+        function filterTableTab(tabId, btn) {
+            document.querySelectorAll('.table-tab-pane').forEach(el => {
+                el.classList.toggle('hidden', el.id !== tabId);
+            });
+            document.querySelectorAll('.table-tab-btn').forEach(b => {
+                b.className = 'table-tab-btn px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer';
+            });
+            if (btn) btn.className = 'table-tab-btn px-2.5 py-1 rounded-full bg-emerald-800 text-white cursor-pointer';
         }
         function filterFormulaCat(cat, btn) {
             document.querySelectorAll('.formula-cat-card').forEach(el => {
@@ -21974,7 +22107,7 @@
             if (btn) btn.className = 'formula-cat-btn px-2.5 py-1 rounded-full bg-slate-900 text-white cursor-pointer';
         }
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') toggleFormulaDrawer(false);
+            if (e.key === 'Escape') { toggleFormulaDrawer(false); toggleTablesDrawer(false); }
         });
     </script>
 </body>
