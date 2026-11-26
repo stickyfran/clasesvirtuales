@@ -412,6 +412,13 @@ input.tight-checkbox {
 }
 
 
-#flip1 {
+#footerleft #flip1 {
 	display: inline-block;
+	width: auto;
+	vertical-align: middle;
+}
+
+#footerleft #help-fixed-btn {
+	vertical-align: middle;
+	margin-left: 6px;
 }
