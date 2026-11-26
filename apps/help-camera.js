@@ -473,7 +473,7 @@
       var base64Data = await resizeImageToBase64(file, 1280, 0.82);
       var contextTitle = document.title || "Estadística";
       var prompt =
-        "Transcribí los enunciados de esta guía de ejercicios de probabilidad y estadística y explicá paso a paso cómo resolver cada uno con fines de estudio. Definí la variable aleatoria, la distribución o estadístico, los parámetros/datos y cada paso del cálculo en LaTeX ($...$ y $$...$$). Al final de cada ejercicio, agregá una sección **Respuesta:** con una oración completa en español que responda directamente a la pregunta en palabras y contexto (no solo el valor numérico o la aritmética).";
+        "Transcribí los enunciados que aparecen en esta imagen y desarrollá la resolución paso a paso en LaTeX ($...$ y $$...$$), definiendo variables, distribución o estadístico y parámetros. Al final de cada ejercicio, incluí una sección **Respuesta:** con una oración completa en español que responda directamente a la pregunta en palabras y contexto (no solo el valor numérico o la aritmética).";
 
       var reply = await sendImageQuery(prompt, base64Data);
       if (isRefusalReply(reply)) {
@@ -537,7 +537,7 @@
     if (!detail || !detail.ok || !Array.isArray(detail.messages)) return false;
 
     for (var j = detail.messages.length - 1; j >= 0; j--) {
-      if (detail.messages[j].role === "assistant" && detail.messages[j].content) {
+      if (detail.messages[j].role === "assistant" && detail.messages[j].content && !isRefusalReply(detail.messages[j].content)) {
         resolutions.push({
           reply: detail.messages[j].content,
           timeLabel: formatTimeLabel(new Date()),
