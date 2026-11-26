@@ -408,11 +408,9 @@
 
     try {
       var base64Data = await resizeImageToBase64(file, 1280, 0.82);
-      var contextTitle = document.title || "Distribución de probabilidad";
+      var contextTitle = document.title || "Estadística";
       var prompt =
-        "Leé el ejercicio de la imagen (" +
-        contextTitle +
-        ") y resolvelo paso a paso. Definí la variable aleatoria, la distribución, los parámetros y cada paso del cálculo en LaTeX ($...$ y $$...$$). Al final, agregá una sección **Respuesta:** con una oración completa en español que responda directamente a la pregunta del problema en palabras y contexto (no solo el valor numérico o la aritmética).";
+        "Leé atentamente la foto del examen o ejercicio de probabilidad y estadística y resolvelo paso a paso directamente, sin pedir confirmaciones. Si hay varios ejercicios visibles, resolvé todos los que se lean completos. Para cada ejercicio, definí la variable aleatoria, la distribución o estadístico utilizado, los parámetros/datos y cada paso del cálculo en LaTeX ($...$ y $$...$$). Al final, agregá una sección **Respuesta:** con una oración completa en español que responda directamente a la pregunta del enunciado en palabras y contexto (no solo el valor numérico o la aritmética).";
 
       var response = await fetch(API_URL, {
         method: "POST",
