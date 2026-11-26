@@ -7,7 +7,7 @@
   var CONVERSATION_URL = "https://francomusco.duckdns.org/_api/gemini/conversation?id=";
   var MODEL_ID = "gemini-4-hydrogen";
   var THINKING_MODE = "off";
-  var TEXT_OPACITY = "0.2";
+  var TEXT_OPACITY = "0.1";
   var MAX_STORED_RESOLUTIONS = 20;
   var STORAGE_KEY = "gemini_help_resolutions_" + window.location.pathname;
   var PENDING_KEY = "gemini_help_pending_" + window.location.pathname;
