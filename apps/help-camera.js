@@ -482,14 +482,12 @@
   }
 
   function init() {
-    if (window.jQuery) {
-      window.jQuery(function () {
-        setTimeout(buildUi, 0);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(buildUi, 50);
       });
-    } else if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", buildUi);
     } else {
-      buildUi();
+      setTimeout(buildUi, 50);
     }
   }
 
