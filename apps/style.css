@@ -336,6 +336,7 @@ input.tight-checkbox {
 .gemini-panel-body {
 	font-size: 100%;
 	overflow-x: auto;
+	opacity: 0.5;
 }
 
 .gemini-panel-body p {
