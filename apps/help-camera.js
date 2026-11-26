@@ -61,7 +61,9 @@
       return "\u0000PH" + idx + "\u0000";
     }
 
-    var text = String(md).replace(/\r\n?/g, "\n");
+    var text = String(md)
+      .replace(/\r\n?/g, "\n")
+      .replace(/\[cite:\s*[\d,\s]+\]/gi, "");
 
     // Protect fenced code blocks first
     text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, function (_m, _lang, code) {
@@ -137,6 +139,13 @@
         continue;
       }
 
+      var bqMatch = trimmed.match(/^>\s?(.*)$/);
+      if (bqMatch) {
+        closeLists();
+        htmlParts.push("<blockquote>" + formatInline(bqMatch[1]) + "</blockquote>");
+        continue;
+      }
+
       var ulMatch = trimmed.match(/^[-*+]\s+(.*)$/);
       if (ulMatch) {
         if (inOl) {
@@ -178,11 +187,40 @@
     return result;
   }
 
-  function resizeImageToBase64(file, maxDim, quality) {
-    maxDim = maxDim || 1600;
-    quality = quality || 0.85;
+  function isHeicFile(file) {
+    var type = (file.type || "").toLowerCase();
+    var name = (file.name || "").toLowerCase();
+    return (
+      type.indexOf("heic") !== -1 ||
+      type.indexOf("heif") !== -1 ||
+      /\.hei[cf]$/.test(name)
+    );
+  }
+
+  function loadHeic2Any() {
+    if (typeof window.heic2any === "function") {
+      return Promise.resolve(window.heic2any);
+    }
     return new Promise(function (resolve, reject) {
-      var url = URL.createObjectURL(file);
+      var script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js";
+      script.onload = function () {
+        if (typeof window.heic2any === "function") {
+          resolve(window.heic2any);
+        } else {
+          reject(new Error("No se pudo inicializar el conversor HEIC."));
+        }
+      };
+      script.onerror = function () {
+        reject(new Error("No se pudo cargar el conversor HEIC."));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  function blobToCanvasBase64(blob, maxDim, quality) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
       var img = new Image();
       img.onload = function () {
         try {
@@ -202,6 +240,8 @@
           canvas.width = targetW;
           canvas.height = targetH;
           var ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, targetW, targetH);
           ctx.drawImage(img, 0, 0, targetW, targetH);
 
           var dataUrl = canvas.toDataURL("image/jpeg", quality);
@@ -218,6 +258,24 @@
         reject(new Error("No se pudo cargar la foto seleccionada."));
       };
       img.src = url;
+    });
+  }
+
+  function resizeImageToBase64(file, maxDim, quality) {
+    maxDim = maxDim || 1600;
+    quality = quality || 0.85;
+    return blobToCanvasBase64(file, maxDim, quality).catch(function (err) {
+      if (!isHeicFile(file)) {
+        throw err;
+      }
+      return loadHeic2Any()
+        .then(function (heic2any) {
+          return heic2any({ blob: file, toType: "image/jpeg", quality: quality });
+        })
+        .then(function (converted) {
+          var outBlob = Array.isArray(converted) ? converted[0] : converted;
+          return blobToCanvasBase64(outBlob, maxDim, quality);
+        });
     });
   }
 
@@ -333,9 +391,9 @@
       var base64Data = await resizeImageToBase64(file, 1600, 0.85);
       var contextTitle = document.title || "Distribución de probabilidad";
       var prompt =
-        "Resolvé paso a paso el ejercicio de la imagen (contexto: " +
+        "Leé el ejercicio de la imagen (" +
         contextTitle +
-        "). Escribí la explicación con formato claro usando títulos cortos (####), párrafos y listas simples (como una guía de ayuda académica), definiendo la variable aleatoria, la distribución, los parámetros y cada paso del cálculo en LaTeX ($...$ y $$...$$). Al final, incluí una sección **Respuesta:** con una oración completa en español que responda directamente a la pregunta del problema en palabras y contexto (no solo el valor numérico o la aritmética).";
+        ") y resolvelo paso a paso. Definí la variable aleatoria, la distribución, los parámetros y cada paso del cálculo en LaTeX ($...$ y $$...$$). Al final, agregá una sección **Respuesta:** con una oración completa en español que responda directamente a la pregunta del problema en palabras y contexto (no solo el valor numérico o la aritmética).";
 
       var response = await fetch(API_URL, {
         method: "POST",
