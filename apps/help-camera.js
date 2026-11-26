@@ -292,7 +292,44 @@
     }
   }
 
+  var fixedBtnEl = null;
+  var FIXED_INDEX = -2;
+
+  function pageSlug() {
+    var m = window.location.pathname.match(/([^\/]+?)(?:\.html)?$/);
+    return (m && m[1]) || "index";
+  }
+
+  function showFixed() {
+    clearLoadingTimer();
+    isLoading = false;
+    isTextHidden = false;
+    panelBodyEl.style.opacity = TEXT_OPACITY;
+    activeIndex = FIXED_INDEX;
+    panelBodyEl.innerHTML = "";
+    openPanel();
+    fetch("fijas/" + pageSlug() + ".md?t=" + Date.now())
+      .then(function (r) {
+        if (!r.ok) throw new Error("no");
+        return r.text();
+      })
+      .then(function (txt) {
+        if (activeIndex !== FIXED_INDEX) return;
+        panelBodyEl.innerHTML = markdownToHtml(txt);
+        typesetMath(panelBodyEl);
+      })
+      .catch(function () {
+        if (activeIndex !== FIXED_INDEX) return;
+        panelBodyEl.innerHTML = markdownToHtml("Sin respuesta fija para esta página.");
+      });
+  }
+
   function renderSolvedButtons() {
+    if (fixedBtnEl) {
+      var fa = isPanelOpen && activeIndex === FIXED_INDEX;
+      fixedBtnEl.className = "help-solved-btn" + (fa ? " active" : "");
+      fixedBtnEl.setAttribute("aria-pressed", String(fa));
+    }
     if (!solvedListEl) return;
     solvedListEl.innerHTML = "";
     for (var i = 0; i < resolutions.length; i++) {
@@ -677,6 +714,25 @@
       solvedListEl = document.createElement("span");
       solvedListEl.id = "help-solved-list";
       smallP.appendChild(solvedListEl);
+    }
+
+    var flipHelp = document.querySelector("#flip1");
+    if (flipHelp) {
+      fixedBtnEl = document.createElement("button");
+      fixedBtnEl.type = "button";
+      fixedBtnEl.id = "help-fixed-btn";
+      fixedBtnEl.className = "help-solved-btn";
+      fixedBtnEl.textContent = "(F)";
+      fixedBtnEl.title = "Ver respuesta fija";
+      fixedBtnEl.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (isPanelOpen && activeIndex === FIXED_INDEX && !isLoading) {
+          closePanel();
+        } else {
+          showFixed();
+        }
+      });
+      flipHelp.appendChild(fixedBtnEl);
     }
 
     fileInputEl = document.createElement("input");

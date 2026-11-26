@@ -262,6 +262,10 @@ input.tight-checkbox {
 	user-select: none;
 }
 
+#help-fixed-btn {
+	margin-left: 5px;
+}
+
 #help-solved-list {
 	display: inline-flex;
 	align-items: center;
@@ -271,6 +275,7 @@ input.tight-checkbox {
 }
 
 .help-solved-btn {
+	opacity: 0.25;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
