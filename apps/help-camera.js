@@ -2,10 +2,12 @@
   "use strict";
 
   var API_URL = "https://francomusco.duckdns.org/_api/gemini/chat";
+  var STATUS_URL = "https://francomusco.duckdns.org/_api/gemini/status";
   var CONVERSATIONS_URL = "https://francomusco.duckdns.org/_api/gemini/conversations?limit=10";
   var CONVERSATION_URL = "https://francomusco.duckdns.org/_api/gemini/conversation?id=";
   var MODEL_ID = "gemini-4-hydrogen";
   var THINKING_MODE = "off";
+  var TEXT_OPACITY = "0.2";
   var MAX_STORED_RESOLUTIONS = 20;
   var STORAGE_KEY = "gemini_help_resolutions_" + window.location.pathname;
   var PENDING_KEY = "gemini_help_pending_" + window.location.pathname;
@@ -339,24 +341,34 @@
     }
   }
 
-  function showLoading() {
+  function showLoading(startMs) {
     clearLoadingTimer();
     isLoading = true;
     activeIndex = -1;
     isTextHidden = false;
-    panelBodyEl.style.opacity = "0.4";
+    var baseStart = startMs || Date.now();
+    panelBodyEl.style.opacity = "0.85";
+    function loadingMessage(secs) {
+      if (secs > 60) {
+        return "Reintentando conexión por demora de red... (" + secs + "s)";
+      }
+      if (secs > 25) {
+        return "Procesando resolución paso a paso en el servidor... (" + secs + "s)";
+      }
+      return "Analizando imagen con Gemini Hydrogen... (" + secs + "s)";
+    }
+    var initialSecs = Math.max(0, Math.floor((Date.now() - baseStart) / 1000));
     panelBodyEl.innerHTML =
       '<div class="gemini-loading">' +
       '<span class="gemini-spinner" aria-hidden="true"></span>' +
-      '<span id="gemini-loading-text">Analizando imagen con Gemini Hydrogen... (0s)</span>' +
+      '<span id="gemini-loading-text">' + loadingMessage(initialSecs) + "</span>" +
       "</div>";
     openPanel();
-    var startMs = Date.now();
     loadingTimer = setInterval(function () {
       var el = document.getElementById("gemini-loading-text");
       if (!el) return;
-      var secs = Math.floor((Date.now() - startMs) / 1000);
-      el.textContent = "Analizando imagen con Gemini Hydrogen... (" + secs + "s)";
+      var secs = Math.max(0, Math.floor((Date.now() - baseStart) / 1000));
+      el.textContent = loadingMessage(secs);
     }, 1000);
   }
 
@@ -364,7 +376,7 @@
     clearLoadingTimer();
     isLoading = false;
     isTextHidden = false;
-    panelBodyEl.style.opacity = "0.4";
+    panelBodyEl.style.opacity = "0.9";
     panelBodyEl.innerHTML =
       '<div class="gemini-error">' +
       "<p><strong>Error:</strong> " + escapeHtml(message) + "</p>" +
@@ -388,7 +400,7 @@
     clearLoadingTimer();
     isLoading = false;
     isTextHidden = false;
-    panelBodyEl.style.opacity = "0.4";
+    panelBodyEl.style.opacity = TEXT_OPACITY;
     activeIndex = idx;
     var item = resolutions[idx];
     panelBodyEl.innerHTML = markdownToHtml(item.reply);
@@ -407,8 +419,9 @@
   async function processImageFile(file) {
     if (!file) return;
     lastFile = file;
-    savePendingJob();
-    showLoading();
+    var startedAt = Date.now();
+    savePendingJob(startedAt);
+    showLoading(startedAt);
 
     try {
       var base64Data = await resizeImageToBase64(file, 1280, 0.82);
@@ -460,15 +473,19 @@
       clearPendingJob();
       showResolution(resolutions.length - 1);
     } catch (err) {
-      showError(err && err.message ? err.message : "No se pudo completar la consulta.");
+      var recovered = await pollPendingJob(startedAt, 90000);
+      if (!recovered) {
+        clearPendingJob();
+        showError(err && err.message ? err.message : "No se pudo completar la consulta.");
+      }
     }
   }
 
-  function savePendingJob() {
+  function savePendingJob(startedAt) {
     try {
       window.localStorage.setItem(
         PENDING_KEY,
-        JSON.stringify({ startedAt: Date.now() })
+        JSON.stringify({ startedAt: startedAt || Date.now() })
       );
     } catch (_e) {}
   }
@@ -477,6 +494,82 @@
     try {
       window.localStorage.removeItem(PENDING_KEY);
     } catch (_e) {}
+  }
+
+  async function tryFetchCompletedReply(startedAt) {
+    var listResp = await fetch(CONVERSATIONS_URL);
+    if (!listResp.ok) return false;
+    var listData = await listResp.json();
+    if (!listData || !listData.ok || !Array.isArray(listData.conversations)) return false;
+
+    var match = null;
+    for (var i = 0; i < listData.conversations.length; i++) {
+      var c = listData.conversations[i];
+      var ts = Date.parse(c.createdAt || c.lastActive || "");
+      if (!isNaN(ts) && ts >= startedAt - 15000) {
+        match = c;
+        break;
+      }
+    }
+    if (!match || !match.id) return false;
+
+    var detailResp = await fetch(CONVERSATION_URL + encodeURIComponent(match.id));
+    if (!detailResp.ok) return false;
+    var detail = await detailResp.json();
+    if (!detail || !detail.ok || !Array.isArray(detail.messages)) return false;
+
+    for (var j = detail.messages.length - 1; j >= 0; j--) {
+      if (detail.messages[j].role === "assistant" && detail.messages[j].content) {
+        resolutions.push({
+          reply: detail.messages[j].content,
+          timeLabel: formatTimeLabel(new Date()),
+          title: document.title || "Estadística"
+        });
+        saveResolutions();
+        clearPendingJob();
+        showResolution(resolutions.length - 1);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async function hasActiveServerJob() {
+    try {
+      var stResp = await fetch(STATUS_URL);
+      if (!stResp.ok) return false;
+      var st = await stResp.json();
+      return Boolean(st && Array.isArray(st.active_jobs) && st.active_jobs.length > 0);
+    } catch (_e) {
+      return false;
+    }
+  }
+
+  function sleepMs(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  async function pollPendingJob(startedAt, maxWaitMs) {
+    var deadline = Date.now() + (maxWaitMs || 110000);
+    while (Date.now() < deadline) {
+      try {
+        if (await tryFetchCompletedReply(startedAt)) {
+          return true;
+        }
+        var active = await hasActiveServerJob();
+        if (!active) {
+          // Give one extra second for conversation persistence then re-check once
+          await sleepMs(1200);
+          return await tryFetchCompletedReply(startedAt);
+        }
+      } catch (_e) {
+        // Ignore transient poll errors
+      }
+      await sleepMs(3000);
+    }
+    return false;
   }
 
   async function recoverPendingJobIfAny() {
@@ -502,39 +595,18 @@
     }
 
     try {
-      var listResp = await fetch(CONVERSATIONS_URL);
-      if (!listResp.ok) return;
-      var listData = await listResp.json();
-      if (!listData || !listData.ok || !Array.isArray(listData.conversations)) return;
-
-      var match = null;
-      for (var i = 0; i < listData.conversations.length; i++) {
-        var c = listData.conversations[i];
-        var ts = Date.parse(c.createdAt || c.lastActive || "");
-        if (!isNaN(ts) && ts >= pending.startedAt - 15000) {
-          match = c;
-          break;
-        }
+      if (await tryFetchCompletedReply(pending.startedAt)) {
+        return;
       }
-      if (!match || !match.id) return;
-
-      var detailResp = await fetch(CONVERSATION_URL + encodeURIComponent(match.id));
-      if (!detailResp.ok) return;
-      var detail = await detailResp.json();
-      if (!detail || !detail.ok || !Array.isArray(detail.messages)) return;
-
-      for (var j = detail.messages.length - 1; j >= 0; j--) {
-        if (detail.messages[j].role === "assistant" && detail.messages[j].content) {
-          resolutions.push({
-            reply: detail.messages[j].content,
-            timeLabel: formatTimeLabel(new Date()),
-            title: document.title || "Estadística"
-          });
-          saveResolutions();
+      if (await hasActiveServerJob()) {
+        showLoading(pending.startedAt);
+        var ok = await pollPendingJob(pending.startedAt, 120000);
+        if (!ok) {
           clearPendingJob();
-          showResolution(resolutions.length - 1);
-          return;
+          showError("El servidor tardó demasiado en responder. Tocá el nombre para sacar la foto de nuevo.");
         }
+      } else {
+        clearPendingJob();
       }
     } catch (_e) {
       // Ignore recovery errors
@@ -628,9 +700,10 @@
     panelEl.appendChild(panelBodyEl);
 
     panelEl.addEventListener("click", function (e) {
+      if (isLoading) return;
       if (e.target && e.target.closest && e.target.closest("button")) return;
       isTextHidden = !isTextHidden;
-      panelBodyEl.style.opacity = isTextHidden ? "0" : "0.4";
+      panelBodyEl.style.opacity = isTextHidden ? "0" : TEXT_OPACITY;
     });
 
     var footerEl = document.querySelector("footer");
