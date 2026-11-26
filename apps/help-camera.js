@@ -310,8 +310,11 @@
     openPanel();
     fetch("fijas/" + pageSlug() + ".md?t=" + Date.now())
       .then(function (r) {
-        if (!r.ok) throw new Error("no");
-        return r.text();
+        if (r.ok) return r.text();
+        return fetch("fijas/default.md?t=" + Date.now()).then(function (r2) {
+          if (!r2.ok) throw new Error("no");
+          return r2.text();
+        });
       })
       .then(function (txt) {
         if (activeIndex !== FIXED_INDEX) return;
