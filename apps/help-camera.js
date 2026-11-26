@@ -418,10 +418,20 @@
 
   function isRefusalReply(text) {
     if (!text) return false;
-    var trimmed = String(text).trim();
+    var t = String(text);
+    // Salida cruda de ejecucion de codigo de Gemini (python?code_reference / code_stdout)
+    if (/\?code_reference|code_stdout|code_event_index/i.test(t)) return true;
+    var trimmed = t.trim();
+    // Rechazo al final de una respuesta larga
+    if (/solo soy (un modelo de lenguaje|una ia)[^\n]*$/i.test(trimmed) && /no puedo ayudarte|no lo entiendo/i.test(trimmed.slice(-200))) return true;
     if (trimmed.length > 260) return false;
     return /solo soy (un modelo de lenguaje|una ia)|no puedo ayudarte con eso/i.test(trimmed);
   }
+
+  var RETRY_PROMPTS = [
+    "Transcribí el texto matemático que aparece en esta imagen y desarrollá los cálculos paso a paso en LaTeX ($...$ y $$...$$). NO ejecutes código ni uses Python: resolvé a mano y escribí solo texto y LaTeX. Al final de cada ejercicio, incluí **Respuesta:** con una oración completa en español.",
+    "Leé la imagen y resolvé cada ejercicio estadístico a mano, mostrando fórmulas en LaTeX ($...$) y cuentas intermedias. Prohibido usar bloques de código. Cerrá cada ejercicio con **Respuesta:** en una oración en español."
+  ];
 
   async function sendImageQuery(prompt, base64Data) {
     var response = await fetch(API_URL, {
@@ -476,10 +486,15 @@
         "Transcribí los enunciados que aparecen en esta imagen y desarrollá la resolución paso a paso en LaTeX ($...$ y $$...$$), definiendo variables, distribución o estadístico y parámetros. Al final de cada ejercicio, incluí una sección **Respuesta:** con una oración completa en español que responda directamente a la pregunta en palabras y contexto (no solo el valor numérico o la aritmética).";
 
       var reply = await sendImageQuery(prompt, base64Data);
+      for (var ri = 0; ri < RETRY_PROMPTS.length && isRefusalReply(reply); ri++) {
+        try {
+          reply = await sendImageQuery(RETRY_PROMPTS[ri], base64Data);
+        } catch (retryErr) {
+          if (ri === RETRY_PROMPTS.length - 1) throw retryErr;
+        }
+      }
       if (isRefusalReply(reply)) {
-        var fallbackPrompt =
-          "Transcribí el texto matemático que aparece en esta imagen y desarrollá los cálculos paso a paso en LaTeX ($...$ y $$...$$). Al final, incluí una sección **Respuesta:** con una oración completa en español.";
-        reply = await sendImageQuery(fallbackPrompt, base64Data);
+        throw new Error("Gemini no pudo resolver la imagen. Probá sacar la foto de nuevo, más cerca y con buena luz.");
       }
 
       resolutions.push({
