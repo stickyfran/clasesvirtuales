@@ -340,8 +340,8 @@
     clearLoadingTimer();
     isLoading = true;
     activeIndex = -1;
-    panelTitleEl.textContent = "";
-    panelTimeEl.textContent = "";
+    isTextHidden = false;
+    panelBodyEl.style.opacity = "0.4";
     panelBodyEl.innerHTML =
       '<div class="gemini-loading">' +
       '<span class="gemini-spinner" aria-hidden="true"></span>' +
@@ -360,8 +360,8 @@
   function showError(message) {
     clearLoadingTimer();
     isLoading = false;
-    panelTitleEl.textContent = "";
-    panelTimeEl.textContent = "";
+    isTextHidden = false;
+    panelBodyEl.style.opacity = "0.4";
     panelBodyEl.innerHTML =
       '<div class="gemini-error">' +
       "<p><strong>Error:</strong> " + escapeHtml(message) + "</p>" +
@@ -384,10 +384,10 @@
     if (idx < 0 || idx >= resolutions.length) return;
     clearLoadingTimer();
     isLoading = false;
+    isTextHidden = false;
+    panelBodyEl.style.opacity = "0.4";
     activeIndex = idx;
     var item = resolutions[idx];
-    panelTitleEl.textContent = "Resolución (" + (idx + 1) + ")";
-    panelTimeEl.textContent = item.timeLabel ? " (" + item.timeLabel + ")" : "";
     panelBodyEl.innerHTML = markdownToHtml(item.reply);
     openPanel();
     typesetMath(panelBodyEl);
@@ -527,30 +527,16 @@
     panelEl.setAttribute("aria-label", "Resolución paso a paso");
     panelEl.style.display = "none";
 
-    var headerEl = document.createElement("div");
-    headerEl.className = "gemini-panel-header";
-
-    var headerLeft = document.createElement("div");
-    headerLeft.className = "gemini-panel-meta";
-
-    panelTitleEl = document.createElement("strong");
-    panelTitleEl.className = "gemini-panel-title";
-
-    panelTimeEl = document.createElement("span");
-    panelTimeEl.className = "gemini-panel-time";
-
-    headerLeft.appendChild(panelTitleEl);
-    headerLeft.appendChild(panelTimeEl);
-
     var closeBtn = document.createElement("button");
     closeBtn.type = "button";
     closeBtn.className = "gemini-panel-close";
     closeBtn.textContent = "×";
-    closeBtn.title = "Cerrar resolución";
-    closeBtn.setAttribute("aria-label", "Cerrar resolución");
+    closeBtn.title = "Cerrar";
+    closeBtn.setAttribute("aria-label", "Cerrar");
     closeBtn.addEventListener("click", closePanel);
 
-    headerEl.appendChild(headerLeft);
+    var headerEl = document.createElement("div");
+    headerEl.className = "gemini-panel-header";
     headerEl.appendChild(closeBtn);
 
     panelBodyEl = document.createElement("div");
