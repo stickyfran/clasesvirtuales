@@ -1,0 +1,230 @@
+<!--Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!----------------------------------------------------->
+
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Inference for μ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<script src="common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+<script src="mu.raw.object.js"></script>
+<script src="normalinference.object.js"></script>
+<script src="tinference.object.js"></script>
+
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    },
+    svg: {
+      fontCache: 'global'
+    }
+  };
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  // Retained original accessible toggle script for the Help menu
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+google.charts.load('current', {'packages':['corechart']});
+
+function runInference(f) {
+    if(allValid(f.n.value, f.xbar.value, f.sd.value)) {
+        ztInference(f.n.value, f.xbar.value, f.sd.value, 
+            1-f.conflevel.value, f.citype.value, f.sddropdown.value, 
+            f.H0input.value, f.Haselect.value, f.signiflevel.value);
+    }
+}
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-40ZCT9CYKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-40ZCT9CYKC');
+</script>
+</head>
+
+<body onload="$('#ci, #test, #testoutput, #data').hide(0); document.getElementById('rawcheckbox').checked = false;">
+
+<script>
+function nValid(n) { return (!isNaN(n) && n >= 1 && n == parseInt(n) && n !== ''); }
+function xbarValid(xbar) { return (!isNaN(xbar) && xbar !== ''); }
+function sdValid(sd) { return (!isNaN(sd) && sd > 0 && sd !== ''); }
+
+function allValid(n, xbar, sd) {
+    if(nValid(n) && xbarValid(xbar) && sdValid(sd)) {
+        $('#ci, #test, #testoutput').show(700);
+        return true;
+    }
+    $('#ci, #test, #testoutput').hide(700);
+    return false;
+}
+
+function h0haValid(h0, ha) { return (!isNaN(h0) && h0 !== '' && !isNaN(ha) && ha !== ''); }
+</script>
+
+<main>
+<h3>Statistical Inference for $\mu$</h3>
+
+<form id="muForm">
+    <div id='data'>
+        <input TYPE="TEXT" ID="rawdata" aria-label="Raw data input"
+            VALUE="" placeholder="Enter data separated by a comma, e.g. 8.2, 9.4, 6.1"
+            ONCHANGE="
+                this.form.n.disabled = true;
+                this.form.xbar.disabled = true;
+                var dataarray = JSON.parse('[' + this.value + ']');
+                if(dataarray.length > 0) {
+                    this.form.n.value = dataarray.length;
+                    var xObj = jStat(dataarray);
+                    this.form.xbar.value = xObj.mean().toFixed(5);
+                    if(this.form.sddropdown.value == 's') {
+                        this.form.sd.value = xObj.stdev(true).toFixed(5);
+                        this.form.sd.disabled = true;
+                    }
+                }
+                runInference(this.form);
+            ">
+    </div>
+
+    <table role="presentation">
+        <tr>
+            <td><span aria-hidden="true">$n=$</span></td>
+            <td><input TYPE="TEXT" NAME="n" SIZE="7" ID="n" aria-label="Sample size n" ONCHANGE="if(!nValid(this.value)) this.value=''; runInference(this.form);"></td>
+        </tr>
+        <tr>
+            <td><span aria-hidden="true">$\bar{x}=$</span></td>
+            <td><input TYPE="TEXT" NAME="xbar" SIZE="7" ID="xbar" aria-label="Sample mean x-bar" ONCHANGE="if(!xbarValid(this.value)) this.value=''; runInference(this.form);"></td>
+            <td><select name="sddropdown" aria-label="Standard deviation type" ONCHANGE="runInference(this.form);">
+                <option value="s" selected>s=</option>
+                <option value="sigma">σ=</option>
+            </select></td>
+            <td><input TYPE="TEXT" NAME="sd" SIZE="7" ID="sd" aria-label="Standard deviation value" ONCHANGE="if(!sdValid(this.value)) this.value=''; runInference(this.form);"></td>
+        </tr>
+    </table>
+
+    <div id='ci' aria-live="polite">
+        <p class="mathjaxCenter">
+            <select name="conflevel" aria-label="Confidence level" ONCHANGE="runInference(this.form);">
+                <option value="0.80">80%</option><option value="0.90">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option>
+            </select>
+            <select name="citype" aria-label="Confidence interval boundary type" ONCHANGE="runInference(this.form);">
+                <option value="ci" selected>CI</option><option value="upper">upper bound</option><option value="lower">lower bound</option>
+            </select>
+            for $\mu$: <span id="ci_output" class="mathjaxCI"></span>
+        </p>
+    </div>
+
+    <div id="test">
+        <p class="mathjaxCenter">
+            <span aria-hidden="true">$H_0:\mu$</span>
+            <select name="H0select" aria-label="Null hypothesis condition" ONCHANGE="if(this.value=='eq') this.form.Haselect.value='neq'; runInference(this.form);">
+                <option value="eq" selected>=</option><option value="ge">≥</option><option value="le">≤</option>
+            </select>
+            <input TYPE="TEXT" NAME="H0input" SIZE="7" aria-label="Null hypothesis value" PLACEHOLDER="μ₀" ONCHANGE="this.form.Hainput.value=this.value; runInference(this.form);">
+            <br>
+            <span aria-hidden="true">$H_a:\mu$</span>
+            <select name="Haselect" aria-label="Alternative hypothesis condition" ONCHANGE="runInference(this.form);">
+                <option value="neq" selected>≠</option><option value="gt">&gt;</option><option value="lt">&lt;</option>
+            </select>
+            <input TYPE="TEXT" NAME="Hainput" SIZE="7" aria-label="Alternative hypothesis value" PLACEHOLDER="μ₀" ONCHANGE="this.form.H0input.value=this.value; runInference(this.form);">
+        </p>
+        <p class="mathjaxCenter">
+            <label for="signiflevelSelect">Significance level: α =</label>
+            <select id="signiflevelSelect" name="signiflevel" ONCHANGE="runInference(this.form);">
+                <option value="0.20">0.20</option><option value="0.10">0.10</option><option value="0.05" selected>0.05</option><option value="0.01">0.01</option>
+            </select>
+        </p>
+        <p id='criticalValue' class='mathjaxCenter' aria-live="polite"></p>
+    </div>
+
+    <div id="testoutput" aria-live="polite">
+        <p id='test_stat' class='mathjaxCenter'></p>
+        <p id='p_value' class='mathjaxCenter'></p>
+        <br>
+        <div id='pdfPlot' role="figure" aria-label="Probability density function plot"></div>
+    </div>
+
+    <div style="display: flex; margin-bottom: 5px; justify-content: space-between; align-items: center; margin-top: 15px; padding: 0 5px;">
+        <p class='small' style="margin: 0;">
+            <label>Show equations 
+            <input id="showeq" type="checkbox" style="width: auto; margin-right: 5px; vertical-align: middle;" onchange="runInference(this.form);"></label>
+            &nbsp;&nbsp;&nbsp; 
+            <label>Enter raw data <input id="rawcheckbox" type="checkbox" style="width: auto; margin-right: 5px; vertical-align: middle;" onchange="
+                    if(this.checked) {
+                        $('#data').show(700);
+                        this.form.n.disabled = true;
+                        this.form.xbar.disabled = true;
+                    } else {
+                        $('#data').hide(700);
+                        this.form.n.disabled = false;
+                        this.form.xbar.disabled = false;
+                        this.form.sd.disabled = false;
+                    }
+                "></label>
+        </p>
+        <div>
+            <input id="refreshbutton" type="button" value="Refresh" aria-label="Refresh application" style="width: auto; cursor: pointer; padding: 2px 10px; margin-right: 0;" onclick="runInference(this.form);">
+        </div>
+    </div>
+
+</form>
+</main>
+
+<footer>
+    <div id="footerleft">
+        <div id="flip1">
+            <button aria-expanded="false" aria-controls="panel1" style="cursor: pointer;">Help</button>
+        </div>
+    </div>
+    <div id="footerright"><p class='small'>©2026 Matt Bognar</p></div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Information">
+    <p>This applet performs inference for a population mean $\mu$.</p>
+
+    <h4>Assume</h4>
+    <p>$X_i \stackrel{iid}{\sim} N(\mu,\sigma^2)$ for $i=1,\ldots,n$</p>
+
+    <h4>Directions</h4>
+    <ul>
+        <li>Enter the sample size in the $n$ box.</li>
+        <li>Enter the sample mean in the $\bar{x}$ box.</li>
+        <li>Enter either the population standard deviation $\sigma$ or the sample standard deviation $s$.</li>
+        <li>Hitting "Tab" or "Enter" will compute a confidence interval for $\mu$.</li>
+    </ul>
+
+    <p>To perform a hypothesis test for $\mu$, enter $H_0$ and $H_a$. The critical value, rejection region, test statistic, and $p$-value are computed and graphed.</p>
+</div>
+</body>
+</html>
+

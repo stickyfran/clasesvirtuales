@@ -1,0 +1,258 @@
+/* <!--Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!-----------------------------------------------------> */
+
+body {
+	font-size:100%;
+	font-family: Arial, Helvetica, sans-serif;
+	width: 98%;
+	max-width: 800px;
+	margin-left: 1%;
+	margin-right: 1%;
+	background: rgb(245,245,245);
+}
+    
+input {
+    border: 1px solid rgb(150,150,150); 
+	border-radius: 5px;
+    padding: 6px;
+    background-color: rgb(255,255,255);
+    margin: 2px 12px 0 0;
+	width: 70px;
+}
+
+input#rawdata {
+	width:97%;
+	margin-left: 1%;
+	margin:auto;
+	margin-bottom: 5px;
+}
+
+select {
+	margin: 2px 0px 0 0;
+}
+
+button {
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius:5px;
+	border: solid 1px rgb(180,180,180);
+	color: rgb(80,80,80);
+	background-color: rgb(210,210,210);
+	margin-left: 1px;
+}
+
+#flip1 {
+	cursor: pointer;
+	width: 0%;
+}
+
+#panel1 {
+	display:none;
+	padding: 5px;
+	border: solid 1px rgb(200,200,200);
+	border-radius: 3px;
+	background-color: rgb(230,230,230);
+	box-shadow: 0px 0px 6px rgba(0,0,0,0.15);
+}
+
+table,td,th {
+	text-align:right;
+	margin: auto;
+}
+
+h3 {
+	text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+	padding: 1px;
+	text-align: center;
+	background-color: rgb(230,230,230);
+	border: solid 1px rgb(200,200,200);
+	border-radius: 5px;
+	position: relative;
+	margin: 0px 0px 10px 0px;
+	box-shadow: 0px 0px 6px rgba(0,0,0,0.15);
+}
+
+p.mathjaxText {
+	font-size:100%;
+	text-align: left;
+}
+
+p {
+	color: black; 
+}
+
+p.small {
+	font-size:70%;
+	font-family:sans-serif;
+	color: grey;
+	padding: 0px;
+	margin-top: 5px;
+	margin-right: 5px;
+	margin-bottom: 5px;
+}
+
+p.mathjaxMoments {
+	font-size:70%;
+	font-family:sans-serif;
+	margin: auto;
+	text-align: center;
+	color: rgb(120,120,120);
+	padding: 15px;
+}
+
+p.mathjaxCenter {
+	font-size:90%;
+	font-family:courier;
+	margin-bottom: 0px;
+	text-align: center;
+	color: rgb(120,120,120);
+}
+
+p.mathjaxCI {
+	font-size:90%;
+	font-family:courier;
+	text-align: center;
+	color: rgb(120,120,120);
+}
+
+div {
+	padding:0px;
+}
+
+div#pmfPlot {
+	margin-left: 20px;
+}
+
+div#pdfPlot {
+	margin-left: 20px;
+}
+
+footer {
+	background-color: rgb(230,230,230);
+	border: solid 1px rgb(200,200,200);
+	border-radius: 5px;
+	display: block;
+	box-shadow: 0px 0px 6px rgba(0,0,0,0.15);
+}
+
+#footerleft {
+	float: left;
+	padding-left: 1px;
+	padding-top: 1px;
+}
+
+#footerright {
+	text-align: right;
+	padding-right: 5px;
+}
+
+ul {
+	margin-top: -5px;
+}
+
+li {
+	margin-bottom: 3px;
+}
+
+/* Screen Reader Only Utility Class */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Style details summary to look like the old button */
+#help-menu summary {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: normal;
+    color: black;
+    list-style: none; /* removes default arrow in some browsers */
+}
+
+/* Fallback to hide default arrow in webkit browsers */
+#help-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+#help-menu summary:hover {
+    background-color: #e0e0e0;
+}
+
+/* Styles the actual help panel that expands */
+#panel1 {
+    margin-top: 15px;
+    text-align: left;
+}
+
+/* Existing button styles ... */
+button {
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius:5px;
+	border: solid 1px rgb(180,180,180);
+	color: rgb(80,80,80);
+	background-color: rgb(210,210,210);
+	margin-left: 1px;
+    padding: 1px 10px;
+    cursor: pointer;
+}
+
+/* Layout for the bottom controls */
+.form-controls-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding: 0 5px;
+}
+
+.refresh-container {
+    text-align: right;
+}
+
+/* Make the Refresh input look like the Help button */
+#refreshbutton {
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	border: solid 1px rgb(180,180,180);
+	color: rgb(80,80,80);
+	background-color: rgb(210,210,210);
+    padding: 1px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    width: auto; /* Override the fixed width for text inputs */
+    margin-right: 0;
+}
+
+#refreshbutton:hover {
+    background-color: rgb(195,195,195);
+}
+
+#refreshbutton:active {
+    background-color: rgb(180,180,180);
+}
+
+input.tight-checkbox {
+    width: auto;
+    margin-right: 2px; /* Reduces space after the checkbox */
+    margin-left: 2px;  /* Reduces space before the checkbox (after the text) */
+    vertical-align: middle; /* Ensures text and checkbox line up vertically */
+}
+

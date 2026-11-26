@@ -1,0 +1,725 @@
+<!--Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!----------------------------------------------------->
+
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Binomial Distribution Applet/Calculator</title>
+<meta name="viewport" content="width=device-width">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<script src="common.js"></script>
+<!-- <script src="jstat.new.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+
+<script src="bin.object.js"></script>
+<script src="https://mabognar.github.io/apps/normal.object.js"></script>
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true
+  },
+  options: {
+    enableMenu: true // This allows users to right-click for accessibility features
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+<!-- <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML"></script> -->
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+// Help Panel with ARIA Accessibility Update
+$(document).ready(function(){
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+// Tooltip
+$(function() {
+$("#bulb img[title]").tooltip({
+   offset: [0, 120],
+   effect: 'fade'
+}).dynamic({ bottom: { direction: 'down', bounce: true } });
+});
+
+// Load the Visualization API
+google.charts.load('current', {'packages':['corechart']});
+
+// Google Analytics
+var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-21570114-2']);
+	_gaq.push(['_trackPageview']);
+
+(function() 
+{
+	var ga = document.createElement('script'); 
+	ga.type = 'text/javascript'; 
+	ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + 
+		'.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; 
+	s.parentNode.insertBefore(ga, s);
+}
+)();
+
+$(document).ready(function(){
+	$("input").change(function(){
+		//alert("The text has been changed.");
+	});
+});
+
+$("#tabs").tabs({
+    activate: function (event, ui) {
+        var active = $('#tabs').tabs('option', 'active');
+        $("#tabid").html('the tab id is ' + $("#tabs ul>li a").eq(active).attr("href"));
+    }
+});
+</script>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-40ZCT9CYKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-40ZCT9CYKC');
+</script>
+</head>
+
+<body onload="
+	$('#method').hide(0);
+	$('#mom').hide(0);
+	$('#ci').hide(0); 
+	$('#test').hide(0);">
+
+<main>
+<h3>Binomial Distribution<br>$X \sim Bin(n, p)$</h3>
+
+<div>
+<form>
+<table role="presentation">
+	<tr>
+		<td>$n=$</td>
+		<td><input TYPE="TEXT" NAME="n" SIZE="7" VALUE="" aria-label="Number of trials n" 
+			ONCHANGE="
+				if(isNaN(this.form.n.value) 
+					|| eval(this.form.n.value) < 1 
+					|| eval(this.form.n.value) != parseInt(this.form.n.value)) {
+					alert('Error: Choose n=1,2,3,...');
+					this.form.n.value = '';
+				}
+				else if(!isNaN(eval(this.form.p.value))) {
+						bin = new binomialDistribution(this.form.n.value, this.form.p.value);
+						bin.plotPmf();
+						this.form.prob.value='';
+						if(this.form.x.value != '') {
+							if(this.form.mydropdown.value == 'eq'){
+								bin.plotPmf(this.form.x.value,0);
+								this.form.prob.value = roundNumber(bin.pmf(this.form.x.value),5);
+							}
+							if(this.form.mydropdown.value == 'le'){
+								bin.plotPmf(this.form.x.value,1);
+								this.form.prob.value = roundNumber(bin.cdf(this.form.x.value),5);
+							}
+							if(this.form.mydropdown.value == 'ge'){
+								bin.plotPmf(this.form.x.value,2);
+								this.form.prob.value = roundNumber(1-bin.cdf(this.form.x.value-1),5);
+							}
+						}
+						bin.printMoments();
+						$('#pmfPlot').show(700);
+						$('#mom').show(700);
+						$('#mydropdowndiv').show(700);	
+						$('#probdiv').show(700);	
+						$('#method').hide(700);
+						$('#ci').hide(700);
+						$('#test').hide(700);
+						$('#pdfPlot').hide(700);						
+				}
+				else if(!isNaN(eval(this.form.x.value))) {
+					if(this.form.testType.value == 'wald')
+						wald_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value, 
+							this.form.Hainput.value, this.form.Haselect.value); 
+					if(this.form.testType.value == 'score')
+						score_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+							this.form.Hainput.value, this.form.Haselect.value); 
+					if(this.form.testType.value == 'ac')
+						ac_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+							this.form.Hainput.value, this.form.Haselect.value); 
+					if(this.form.testType.value == 'cp')
+						cp_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+							this.form.Hainput.value, this.form.Haselect.value); 
+					if(this.form.testType.value == 'bl')
+						bl_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+							this.form.Hainput.value, this.form.Haselect.value); 
+				};
+			">
+		</td>
+
+		<td>$p=$</td>
+		<td><input TYPE="TEXT" NAME="p" SIZE="7" VALUE="" aria-label="Probability of success p" 
+			ONCHANGE="
+				if(isNaN(eval(this.form.p.value)) 
+					|| eval(this.form.p.value) < 0 
+					|| eval(this.form.p.value) > 1) {
+					alert('Error: Probability of success p must be between 0 and 1');
+					this.form.p.value = '';
+					$('#pmfPlot').hide(700);
+					$('#mom').hide(700);
+				}
+				else if(this.form.p.value == '' 
+					&& this.form.n.value != ''
+					&& this.form.x.value != '') {
+					$('#pmfPlot').hide(700);
+					$('#mom').hide(700);
+					$('#ci').show(700);
+					$('#tabs').show(700);
+					$('#mydropdowndiv').hide(700);	
+					$('#probdiv').hide(700);
+					$('#method').show(700);
+					$('#ci').show(700);
+					$('#test').show(700);
+					if(this.form.Hainput.value != '') $('#pdfPlot').show(0);					
+					this.form.prob.value = '';
+					if(this.form.testType.value == 'wald')
+						wald_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value, 
+							this.form.Hainput.value, this.form.Haselect.value); 
+					if(this.form.testType.value == 'score')
+						score_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+							this.form.Hainput.value, this.form.Haselect.value); 
+					if(this.form.testType.value == 'ac')
+						ac_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+							this.form.Hainput.value, this.form.Haselect.value); 
+					if(this.form.testType.value == 'cp')
+						cp_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+							this.form.Hainput.value, this.form.Haselect.value); 
+					if(this.form.testType.value == 'bl') {
+						bl_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+							this.form.Hainput.value, this.form.Haselect.value);
+							$('#test').hide(700);
+							$('#pdfPlot').hide(700);
+					}
+				}
+				else if(this.form.p.value != '' 
+					&& this.form.n.value != '') {
+					$('#pmfPlot').show(0);
+					bin = new binomialDistribution(this.form.n.value, this.form.p.value);
+					if(this.form.mydropdown.value == 'eq'){
+						bin.plotPmf(this.form.x.value,0);
+						this.form.prob.value = roundNumber(bin.pmf(this.form.x.value),5);
+					}
+					if(this.form.mydropdown.value == 'le'){
+						bin.plotPmf(this.form.x.value,1);
+						this.form.prob.value = roundNumber(bin.cdf(this.form.x.value),5);
+					}
+					if(this.form.mydropdown.value == 'ge'){
+						bin.plotPmf(this.form.x.value,2);
+						this.form.prob.value = roundNumber(1-bin.cdf(this.form.x.value-1),5);
+					}
+					bin.printMoments();
+					if(this.form.x.value == '') { 
+						this.form.prob.value='';
+						$('#tabs').hide(700);		
+					}
+					else {
+						$('#tabs').hide(700);						
+					}
+					$('#mom').show(700);
+					$('#mydropdowndiv').show(700);	
+					$('#probdiv').show(700);
+					$('#method').hide(700);
+					$('#ci').hide(700);
+					$('#test').hide(700);
+					$('#pdfPlot').hide(700);
+
+				};">
+		</td>
+		<td></td>
+	</tr>
+    
+	<tr>
+		<td>$x=$</td>
+		<td><input TYPE="TEXT" NAME="x" SIZE="7" VALUE="" aria-label="Number of successes x" 
+		ONCHANGE="
+			if(this.form.n.value == '') {
+				alert('Error: Enter sample size n before entering x');
+				this.form.x.value = '';		
+			}
+			else if(this.form.x.value == '') {
+				this.form.prob.value = '';
+				bin.plotPmf(this.form.x.value,0);
+			}
+			else if(isNaN(this.form.x.value) 
+				|| eval(this.form.x.value) > eval(this.form.n.value)
+				|| this.form.x.value != parseInt(this.form.x.value)
+				|| eval(this.form.x.value) < 0) {
+				alert('Error: Choose x=0,1,...,n');
+				this.form.x.value = '';
+			} 
+			else if(this.form.p.value == '') {
+				if(this.form.testType.value == 'wald')
+					wald_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value, 
+						this.form.Hainput.value, this.form.Haselect.value); 
+				if(this.form.testType.value == 'ac')
+					ac_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+						this.form.Hainput.value, this.form.Haselect.value); 
+				if(this.form.testType.value == 'cp')
+					cp_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+						this.form.Hainput.value, this.form.Haselect.value); 
+				if(this.form.testType.value == 'score')
+					score_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+						this.form.Hainput.value, this.form.Haselect.value); 
+				if(this.form.testType.value == 'bl')
+					bl_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+						this.form.Hainput.value, this.form.Haselect.value); 
+				$('#pmfPlot').hide(700);
+				$('#mom').hide(700);
+				$('#mydropdowndiv').hide(700);	
+				$('#probdiv').hide(700);	
+				$('#method').show(700);
+				$('#ci').show(700);
+				if(this.form.testType.value != 'bl') {		
+					$('#test').show(700);
+					if(this.form.Hainput.value != '') $('#pdfPlot').show(700);
+				}
+				else {		
+					$('#test').hide(700);
+					$('#pdfPlot').hide(700);
+				}
+				this.form.prob.value = '';
+			}
+			else {
+				$('#pmfPlot').show(700);
+				$('#mom').show(700);
+				$('#mydropdowndiv').show(700);	
+				$('#probdiv').show(700);	
+				$('#method').hide(700);
+				$('#ci').hide(700);
+				$('#test').hide(700);
+				$('#pdfPlot').hide(700);
+				if(this.form.mydropdown.value == 'eq'){
+					bin.plotPmf(this.form.x.value,0);
+					this.form.prob.value = roundNumber(bin.pmf(this.form.x.value),5);
+				}
+				if(this.form.mydropdown.value == 'le'){
+					bin.plotPmf(this.form.x.value,1);
+					this.form.prob.value = roundNumber(bin.cdf(this.form.x.value),5);
+				}
+				if(this.form.mydropdown.value == 'ge'){
+					bin.plotPmf(this.form.x.value,2);
+					this.form.prob.value = roundNumber(1-bin.cdf(this.form.x.value-1),5);
+				}
+			};">
+		</td>
+
+		<th><div id='mydropdowndiv'>
+            <select name="mydropdown" aria-label="Select probability calculation type" 
+		ONCHANGE="
+					if(this.form.mydropdown.value == 'eq'){
+						bin.plotPmf(this.form.x.value,0);
+						this.form.prob.value = roundNumber(bin.pmf(this.form.x.value),5);
+					}
+					if(this.form.mydropdown.value == 'le'){
+						bin.plotPmf(this.form.x.value,1);
+						this.form.prob.value = roundNumber(bin.cdf(this.form.x.value),5);
+					}
+					if(this.form.mydropdown.value == 'ge'){
+						bin.plotPmf(this.form.x.value,2);
+						this.form.prob.value = roundNumber(1-bin.cdf(this.form.x.value-1),5);
+					}">
+		<option value="eq">P(X&thinsp;=&thinsp;x)&thinsp;&thinsp;=</option>
+		<option value="le">P(X&thinsp;&#8804;&thinsp;x)&thinsp;&thinsp;=</option>
+		<option value="ge">P(X&thinsp;&#8805;&thinsp;x)&thinsp;&thinsp;=</option>
+		</select></div></th>
+
+		<td><div id='probdiv' aria-live="polite"><input TYPE="TEXT" NAME="prob" SIZE="7" VALUE="" aria-label="Calculated probability" readonly STYLE="background-color: #e7b0b0"></div></td>
+	</tr>
+
+  </table>
+  
+<div id="pmfPlot" aria-label="Probability mass function plot" role="figure"></div>
+
+<div id="mom" aria-live="polite">
+<p id="moments" class="mathjaxMoments"></p>
+</div>
+
+
+<div id="method">
+<p class="mathjaxCenter">Inference method:
+<select name="testType" aria-label="Select inference method" 
+	ONCHANGE="
+		if(this.form.testType.value == 'wald') {
+			$('#pmfPlot').hide(0);
+			$('#alert_img').show(0);
+			if(this.form.Hainput.value != '') $('#pdfPlot').show(0);
+			$('#test').show(700);
+			wald_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+			document.getElementById('help_link').href=
+			'https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval';
+		}
+		if(this.form.testType.value == 'score') {
+			$('#pmfPlot').hide(0);
+			if(this.form.Hainput.value != '') $('#pdfPlot').show(0);
+			$('#test').show(700);
+			score_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+			document.getElementById('help_link').href=
+				'https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval';
+		}		
+		if(this.form.testType.value == 'ac') {
+			$('#pmfPlot').hide(0);
+			$('#alert_img').hide(0);
+			if(this.form.Hainput.value != '') $('#pdfPlot').show(0);
+			$('#test').show(700);
+			ac_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+			document.getElementById('help_link').href=
+				'https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Agresti-Coull_Interval';
+		}
+		if(this.form.testType.value == 'cp') {
+			$('#pmfPlot').hide(0);
+			if(this.form.Hainput.value != '') $('#pdfPlot').show(0);
+			$('#test').show(700);
+			cp_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+			document.getElementById('help_link').href=				'https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Clopper-Pearson_interval';
+		}
+		if(this.form.testType.value == 'bl') {
+			$('#pmfPlot').hide(0);
+			if(this.form.Hainput.value != '') $('#pdfPlot').show(0);
+			$('#test').hide(700);
+			bl_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+			$('#pdfPlot').hide(0);
+			document.getElementById('help_link').href='http://onlinelibrary.wiley.com/doi/10.2307/3315916/abstract';
+		}
+	">
+	<option value="wald" selected="selected">Wald</option>
+	<option value="score">Score</option>
+	<option value="ac">Agresti-Coull</option>
+	<option value="cp">Clopper-Pearson</option>
+	<option value="bl">Blaker</option>
+	</select>
+	
+<a id="help_link" style="text-decoration:none;" aria-label="Learn more about this interval on Wikipedia"
+href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval" 
+target="_blank">
+<img width="15" height="15" border="0" align="center" src="https://mabognar.github.io/apps/question.png" alt="Help icon linking to Wikipedia article about the confidence interval"/>
+</a>
+
+</p>
+</div>
+
+
+<div id='ci'>
+<p class="mathjaxCenter">
+<select name="conflevel" aria-label="Select confidence level" 
+	ONCHANGE="
+		if(this.form.testType.value == 'wald')
+			wald_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value, 
+				this.form.Hainput.value, this.form.Haselect.value); 
+		if(this.form.testType.value == 'ac')
+			ac_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+				this.form.Hainput.value, this.form.Haselect.value); 
+		if(this.form.testType.value == 'score')
+			score_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+				this.form.Hainput.value, this.form.Haselect.value); 
+		if(this.form.testType.value == 'cp')
+			cp_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+				this.form.Hainput.value, this.form.Haselect.value); 
+		if(this.form.testType.value == 'bl')
+			bl_inference(this.form.n.value, this.form.x.value, 1-this.form.conflevel.value,
+				this.form.Hainput.value, this.form.Haselect.value); 
+		">
+	<option value="0.80">80%</option>
+	<option value="0.90">90%</option>
+	<option value="0.95" selected="selected">95%</option>
+	<option value="0.99">99%</option>
+	</select>
+
+CI for $p$: <span id="ci_output" class="mathjaxCI" aria-live="polite"></span></p>
+
+</div>
+
+
+<div id="test">
+<p class="mathjaxCenter">$H_0:p$
+<select name="H0select" aria-label="Null hypothesis operator"
+	ONCHANGE="
+		if(this.form.H0select.value == 'eq') {
+			this.form.Haselect.value = 'neq';
+		}
+		if(this.form.H0select.value == 'le') {
+			this.form.Haselect.value = 'gt';
+		}
+		if(this.form.H0select.value == 'ge') {
+			this.form.Haselect.value = 'lt';
+		}
+		if(this.form.testType.value == 'wald') {
+			wald_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+		}
+		if(this.form.testType.value == 'score') {
+			score_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+		}
+		if(this.form.testType.value == 'ac') {
+			ac_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+		}
+		if(this.form.testType.value == 'cp') {
+			cp_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+		}
+		if(this.form.Hainput.value != '') $('#pdfPlot').show(0);	
+		else $('#pdfPlot').hide(0);	
+	">
+	<option value="eq"selected="selected">=</option>
+	<option value="ge">&#8805;</option>
+	<option value="le">&#8804;</option>
+	</select>
+<input TYPE="TEXT" NAME="H0input" SIZE="7" VALUE="" aria-label="Null hypothesis probability" 
+		ONCHANGE="
+			this.form.Hainput.value = this.form.H0input.value;
+			if(this.form.testType.value == 'wald') {
+				$('#pmfPlot').hide(0);
+				$('#pdfPlot').show(0);
+				wald_inference(this.form.n.value, 
+					this.form.x.value, 
+					1-this.form.conflevel.value,
+					this.form.Hainput.value, 
+					this.form.Haselect.value);
+			}
+			if(this.form.testType.value == 'ac') {
+				$('#pmfPlot').hide(0);
+				$('#pdfPlot').show(0);
+				ac_inference(this.form.n.value, 
+					this.form.x.value, 
+					1-this.form.conflevel.value,
+					this.form.Hainput.value, 
+					this.form.Haselect.value);
+			}
+			if(this.form.testType.value == 'score') {
+				$('#pmfPlot').hide(0);
+				$('#pdfPlot').show(0);
+				score_inference(this.form.n.value, 
+					this.form.x.value, 
+					1-this.form.conflevel.value,
+					this.form.Hainput.value, 
+					this.form.Haselect.value);
+			}
+			if(this.form.testType.value == 'cp') {
+				$('#pmfPlot').hide(0);
+				$('#pdfPlot').show(0);
+				cp_inference(this.form.n.value, 
+					this.form.x.value, 
+					1-this.form.conflevel.value,
+					this.form.Hainput.value, 
+					this.form.Haselect.value);
+			}
+			if(this.form.Hainput.value != '') $('#pdfPlot').show(0);	
+			else $('#pdfPlot').hide(0);	
+"><br>
+$H_a:p$
+<select name="Haselect" aria-label="Alternative hypothesis operator" 
+	ONCHANGE="
+		if(this.form.Haselect.value == 'neq') {
+			this.form.H0select.value = 'eq';
+		}
+		if(this.form.Haselect.value == 'gt') {
+			this.form.H0select.value = 'le';
+		}
+		if(this.form.Haselect.value == 'lt') {
+			this.form.H0select.value = 'ge';
+		}
+		if(this.form.testType.value == 'wald') {
+			$('#pmfPlot').hide(0);
+			$('#pdfPlot').show(0);
+			wald_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+		}
+		if(this.form.testType.value == 'score') {
+			$('#pmfPlot').hide(0);
+			$('#pdfPlot').show(0);
+			score_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+		}
+		if(this.form.testType.value == 'ac') {
+			$('#pmfPlot').hide(0);
+			$('#pdfPlot').show(0);
+			ac_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+		}
+		if(this.form.testType.value == 'cp') {
+			$('#pmfPlot').hide(0);
+			$('#pdfPlot').show(0);
+			cp_inference(this.form.n.value, 
+				this.form.x.value, 
+				1-this.form.conflevel.value,
+				this.form.Hainput.value, 
+				this.form.Haselect.value);
+		}
+		if(this.form.Hainput.value != '') $('#pdfPlot').show(0);	
+		else $('#pdfPlot').hide(0);	
+">
+	<option value="neq"selected="selected">&#8800</option>
+	<option value="gt">&gt;</option>
+	<option value="lt">&lt;</option>
+	</select>
+<input TYPE="TEXT" NAME="Hainput" SIZE="7" VALUE="" aria-label="Alternative hypothesis probability" 
+		ONCHANGE="
+			this.form.H0input.value = this.form.Hainput.value;
+			if(this.form.testType.value == 'wald') {
+				$('#pmfPlot').hide(700);
+				$('#pdfPlot').show(700);
+				wald_inference(this.form.n.value, 
+					this.form.x.value, 
+					1-this.form.conflevel.value,
+					this.form.Hainput.value, 
+					this.form.Haselect.value);
+			}
+			if(this.form.testType.value == 'ac') {
+				$('#pmfPlot').hide(700);
+				$('#pdfPlot').show(700);
+				ac_inference(this.form.n.value, 
+					this.form.x.value, 
+					1-this.form.conflevel.value,
+					this.form.Hainput.value, 
+					this.form.Haselect.value);
+			}
+			if(this.form.testType.value == 'score') {
+				$('#pmfPlot').hide(700);
+				$('#pdfPlot').show(700);
+				score_inference(this.form.n.value, 
+					this.form.x.value, 
+					1-this.form.conflevel.value,
+					this.form.Hainput.value, 
+					this.form.Haselect.value);
+			}
+			if(this.form.testType.value == 'cp') {
+				$('#pmfPlot').hide(700);
+				$('#pdfPlot').show(700);
+				cp_inference(this.form.n.value, 
+					this.form.x.value, 
+					1-this.form.conflevel.value,
+					this.form.Hainput.value, 
+					this.form.Haselect.value);
+			}
+			if(this.form.Hainput.value != '') $('#pdfPlot').show(0);	
+			else $('#pdfPlot').hide(0);	
+"></p>
+
+<p id='test_stat' class="mathjaxCenter" aria-live="polite"></p>
+<p id='p_value' class="mathjaxCenter" aria-live="polite"></p>
+
+</div>
+<div id="pdfPlot" aria-label="Probability density function plot" role="figure"></div><br>
+</form>
+</div>
+</main>
+
+<footer>
+<div id="footerleft">
+<div id="flip1"><button aria-expanded="false" aria-controls="panel1">Help</button></div>
+</div>
+<div id="footerright">
+<p class='small'>
+&copy;2026 Matt Bognar, PhD<br>
+</p>
+</div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Information">
+<p>
+This applet computes probabilities for the binomial distribution:
+$$X \sim Bin(n, p)$$
+</p>
+
+<h4>Directions</h4>
+<ul>
+<li>Enter the number of trials in the $n$ box.</li>
+<li>Enter the probability of success in the $p$ box.</li>
+<li>Hitting "Tab" or "Enter" on your keyboard will plot the probability mass function (pmf).</li>
+</ul>
+
+<p>To compute a probability, select $P(X=x)$ from the drop-down box, 
+enter a numeric $x$ value, and press "Enter" on your keyboard. 
+he probability will appear in the result box (highlighted in <span style="background-color: #FFCCCC">pink</span>).
+Select $P(X \leq x)$ from the drop-down box for a left-tail probability (this is the cdf).
+</p>
+
+<h4>Details</h4>
+<ul>
+<li>$f(x)=P(X=x)={n \choose x}p^x(1-p)^{n-x}$<br>for $x=0,1,\ldots,n$</li>
+<li>$\mu=E(X)=np$</li>
+<li>$\sigma^2=Var(X)=np(1-p)$</li>
+<li>$\sigma=SD(X)=\sqrt{np(1-p)}$</li>
+</ul>
+</div>
+
+</body>
+</html>
+

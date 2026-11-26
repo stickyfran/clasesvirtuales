@@ -1,0 +1,521 @@
+<!--Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!----------------------------------------------------->
+
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Inference for p</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<script src="common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+<script src="p.object.js"></script>
+<script src="normalinference.object.js"></script>
+
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<!-- MathJax v3 Configuration -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    },
+    svg: {
+      fontCache: 'global'
+    }
+  };
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+// Help Panel with ARIA Accessibility Update
+$(document).ready(function(){
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+// Tooltip
+$(function() {
+$("#bulb img[title]").tooltip({
+   offset: [0, 120],
+   effect: 'fade'
+}).dynamic({ bottom: { direction: 'down', bounce: true } });
+});
+
+// Load the Visualization API
+google.charts.load('current', {'packages':['corechart']});
+
+// Google Analytics
+var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-21570114-2']);
+    _gaq.push(['_trackPageview']);
+
+(function() 
+{
+    var ga = document.createElement('script'); 
+    ga.type = 'text/javascript'; 
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + 
+        '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; 
+    s.parentNode.insertBefore(ga, s);
+}
+)();
+
+$(document).ready(function(){
+    $("input").change(function(){
+        //alert("The text has been changed.");
+    });
+});
+
+$("#tabs").tabs({
+    activate: function (event, ui) {
+        var active = $('#tabs').tabs('option', 'active');
+        $("#tabid").html('the tab id is ' + $("#tabs ul>li a").eq(active).attr("href"));
+    }
+});
+</script>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-40ZCT9CYKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-40ZCT9CYKC');
+</script>
+</head>
+
+<body onload="
+        $('#ci').hide(0);
+        $('#test').hide(0);
+        $('#testoutput').hide(0);
+        $('#sd1sd2dropdown').hide(0);
+">
+
+<script>
+function nValid(n) {
+    if(n === '' || n === null) return false;
+    var num = eval(n);
+    if(isNaN(num) || (num <= 0) || (num != parseInt(num))) {
+        return false;
+    }
+    else return true;
+}
+
+function phatValid(phat) {
+    if(phat === '' || phat === null) return false;
+    var num = eval(phat);
+    var form = document.getElementById('form0');
+    if(form.phatxselect.value == 'phat') {
+        if(!isNaN(num) && num >= 0 && num <= 1) {
+            return true;
+        }
+    }
+    else if(form.phatxselect.value == 'x') {
+        if(!isNaN(num) && (num >= 0) && (num == parseInt(num))) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function allValid(n, phat) {
+    var form = document.getElementById('form0');
+    if(nValid(n) && phatValid(phat)) {
+        var nVal = eval(n);
+        var phatVal = eval(phat);
+        
+        if((form.testType.value == 'wald' || 
+            form.testType.value == 'score') && 
+            form.phatxselect.value == 'phat' &&
+            (nVal < 30 || nVal*phatVal < 5 || nVal*(1-phatVal) < 5)) {
+            alert('Assumptions violated. Wald and score methods require: ' +
+            '\n   n >= 30 \n   n * p\u0302 >= 5' +
+            '\n   n * (1 - p\u0302) >= 5 \nUse the Agresti-Coull or Clopper-Pearson method for inference.');
+            $('#ci').hide(700);
+            $('#test').hide(700);
+            $('#testoutput').hide(700);
+            return false;
+        }
+        if((form.testType.value == 'wald' || 
+            form.testType.value == 'score') && 
+            form.phatxselect.value == 'x' && 
+            (nVal < 30 || phatVal < 5 || nVal-phatVal < 5)) { 
+            alert('Assumptions violated. Wald and score methods require: ' +
+            '\n   n >= 30 \n   x >= 5' +
+            '\n   n - x >= 5 \nUse the Agresti-Coull or Clopper-Pearson method for inference.');
+            $('#ci').hide(700);
+            $('#test').hide(700);
+            $('#testoutput').hide(700);
+            return false;
+        }
+        $('#ci').show(700);
+        if(form.testType.value != 'cp') {
+            $('#test').show(700);
+            $('#testoutput').show(700);
+        }
+        return true;
+    }
+    else {
+        $('#ci').hide(700);
+        $('#test').hide(700);
+        $('#testoutput').hide(700);
+        return false;
+    }
+}
+
+function h0Valid(h0) {
+    if(h0 === '' || h0 === null) return false;
+    var num = eval(h0);
+    if(isNaN(num)) {
+        return false;
+    }
+    else return true;
+}
+
+function haValid(ha) {
+    if(ha === '' || ha === null) return false;
+    var num = eval(ha);
+    if(isNaN(num)) {
+        return false;
+    }
+    else return true;
+}
+
+function h0haValid(h0, ha) {
+    if(h0Valid(h0) && haValid(ha)) {
+        $('#testoutput').show(700);
+        return true;
+    }
+    else {
+        $('#testoutput').hide(700);
+        return false;
+    }
+}
+</script>
+
+<main>
+<h3>Statistical Inference for $p$<br></h3>
+
+<div>
+<form id="form0">
+
+<table role="presentation">
+    <tr>
+        <td><span aria-hidden="true">$n=$</span></td>
+        <td><input TYPE="TEXT" NAME="n" SIZE="7" aria-label="Sample size n"
+            VALUE=""
+            ONCHANGE="
+                if(!nValid(this.form.n.value) && this.form.n.value !== '') {
+                    alert('Error: Choose n=1,2,...');
+                    this.form.n.value = '';
+                }
+                if(allValid(this.form.n.value, this.form.phat.value)) {
+                    pInference(this.form.n.value, 
+                        this.form.phat.value, 
+                        1-this.form.conflevel.value,
+                        this.form.Hainput.value, 
+                        this.form.Haselect.value, 
+                        this.form.signiflevel.value, 
+                        this.form.testType.value);
+                }
+            ">
+        </td>
+
+        <td>
+        <select name="phatxselect" aria-label="Select proportion or count"
+            onchange="
+                this.form.phat.value = '';
+                $('#ci').hide(700);
+                $('#test').hide(700);
+                $('#testoutput').hide(700);
+            ">
+            <option value="phat">p&#770;=</option>
+            <option value="x">x=</option>
+        </select>
+        </td>
+
+        <td><input TYPE="TEXT" NAME="phat" SIZE="7" aria-label="Sample proportion or count value"
+            VALUE=""
+            ONCHANGE="
+                if(!phatValid(this.form.phat.value) && this.form.phat.value !== '') {
+                    if(this.form.phatxselect.value == 'phat') {
+                        alert('Error: Choose phat in (0,1)');
+                    }
+                    if(this.form.phatxselect.value == 'x') {
+                        alert('Error: Choose x = 0,1,...,n');
+                    }
+                    this.form.phat.value = '';
+                }
+                if(allValid(this.form.n.value, this.form.phat.value)) {
+                    pInference(this.form.n.value, 
+                        this.form.phat.value, 
+                        1-this.form.conflevel.value,
+                        this.form.Hainput.value, 
+                        this.form.Haselect.value, 
+                        this.form.signiflevel.value, 
+                        this.form.testType.value);
+                }
+                ">
+        </td>
+    </tr>
+  </table>
+
+<div id="method">
+<p class="mathjaxCenter">
+<label for="inferenceMethod">Inference method:</label>
+<select name="testType" id="inferenceMethod" aria-label="Inference method"
+    ONCHANGE="
+        if(allValid(this.form.n.value, this.form.phat.value)) {
+            pInference(this.form.n.value, 
+                this.form.phat.value, 
+                1-this.form.conflevel.value,
+                this.form.Hainput.value, 
+                this.form.Haselect.value, 
+                this.form.signiflevel.value, 
+                this.form.testType.value);
+        }
+        if(this.form.testType.value == 'cp') {
+            $('#test').hide(700);
+            $('#testoutput').hide(700);
+            document.getElementById('showeqp').style.color = 'lightgray';
+            document.getElementById('showeq').disabled = true;
+            document.getElementById('showeq').checked = false;
+        }
+        else {
+            document.getElementById('showeqp').style.color = 'gray';
+            document.getElementById('showeq').disabled = false;
+        }
+    ">
+    <option value="wald" selected="selected">Wald</option>
+    <option value="score">Score</option>
+    <option value="ac">Agresti-Coull</option>
+    <option value="cp">Clopper-Pearson</option>
+    </select>
+</p>
+</div>
+
+<div id='ci' aria-live="polite">
+<p class="mathjaxCenter">
+<select name="conflevel" aria-label="Confidence level"
+    ONCHANGE="                  
+        pInference(this.form.n.value, 
+            this.form.phat.value, 
+            1-this.form.conflevel.value,
+            this.form.Hainput.value, 
+            this.form.Haselect.value, 
+            this.form.signiflevel.value, 
+            this.form.testType.value);
+        ">
+    <option value="0.80">80%</option>
+    <option value="0.90">90%</option>
+    <option value="0.95" selected="selected">95%</option>
+    <option value="0.99">99%</option>
+    </select>
+    CI for $p$: <span id="ci_output" class="mathjaxCI"></span></p>
+</div>
+
+<div id="test">
+    <p class="mathjaxCenter"><span aria-hidden="true">$H_0:p$</span>
+    <select name="H0select" aria-label="Null hypothesis operator"
+        ONCHANGE="
+            if(this.form.H0select.value == 'eq') {
+                this.form.Haselect.value = 'neq';
+            }
+            if(this.form.H0select.value == 'le') {
+                this.form.Haselect.value = 'gt';
+            }
+            if(this.form.H0select.value == 'ge') {
+                this.form.Haselect.value = 'lt';
+            }
+            pInference(this.form.n.value, 
+                this.form.phat.value, 
+                1-this.form.conflevel.value,
+                this.form.Hainput.value, 
+                this.form.Haselect.value, 
+                this.form.signiflevel.value, 
+                this.form.testType.value);
+        ">
+        <option value="eq" selected="selected">=</option>
+        <option value="ge">&#8805;</option>
+        <option value="le">&#8804;</option>
+        </select>
+    <input TYPE="TEXT" NAME="H0input" SIZE="7" PLACEHOLDER="p&#8320;" aria-label="Null hypothesis probability value"
+            VALUE=""
+            ONCHANGE="
+                this.form.Hainput.value = this.form.H0input.value;
+                if(h0haValid(this.form.H0input.value,this.form.Hainput.value)) {
+                    pInference(this.form.n.value, 
+                        this.form.phat.value, 
+                        1-this.form.conflevel.value,
+                        this.form.Hainput.value, 
+                        this.form.Haselect.value, 
+                        this.form.signiflevel.value, 
+                        this.form.testType.value);
+                }
+                else if(this.form.H0input.value !== '') {
+                    alert('Error: Enter a numeric value for H0')
+                    this.form.H0input.value = '';
+                    this.form.Hainput.value = '';
+                }
+    "><br>
+
+    <span aria-hidden="true">$H_a:p$</span>
+    <select name="Haselect" aria-label="Alternative hypothesis operator"
+        ONCHANGE="
+            if(this.form.Haselect.value == 'neq') {
+                this.form.H0select.value = 'eq';
+            }
+            if(this.form.Haselect.value == 'gt') {
+                this.form.H0select.value = 'le';
+            }
+            if(this.form.Haselect.value == 'lt') {
+                this.form.H0select.value = 'ge';
+            }
+            pInference(this.form.n.value, 
+                this.form.phat.value, 
+                1-this.form.conflevel.value,
+                this.form.Hainput.value, 
+                this.form.Haselect.value, 
+                this.form.signiflevel.value, 
+                this.form.testType.value);
+        ">
+        <option value="neq" selected="selected">&#8800;</option>
+        <option value="gt">&gt;</option>
+        <option value="lt">&lt;</option>
+        </select>
+    <input TYPE="TEXT" NAME="Hainput" SIZE="7" PLACEHOLDER="p&#8320;" aria-label="Alternative hypothesis probability value"
+            VALUE=""
+            ONCHANGE="
+                this.form.H0input.value = this.form.Hainput.value;
+                if(h0haValid(this.form.H0input.value,this.form.Hainput.value)) {
+                    pInference(this.form.n.value, 
+                        this.form.phat.value, 
+                        1-this.form.conflevel.value,
+                        this.form.Hainput.value, 
+                        this.form.Haselect.value, 
+                        this.form.signiflevel.value, 
+                        this.form.testType.value);
+                }
+                else if(this.form.Hainput.value !== '') {
+                    alert('Error: Enter a numeric value for Ha')
+                    this.form.H0input.value = '';
+                    this.form.Hainput.value = '';
+                }
+        "></p>
+
+    <p class="mathjaxCenter">
+    <label for="signiflevelSelect">Significance level: $\alpha =$</label>
+    <select id="signiflevelSelect" name="signiflevel" aria-label="Significance level alpha"
+        ONCHANGE="                  
+            pInference(this.form.n.value, 
+                this.form.phat.value, 
+                1-this.form.conflevel.value,
+                this.form.Hainput.value, 
+                this.form.Haselect.value, 
+                this.form.signiflevel.value, 
+                this.form.testType.value);
+            ">
+        <option value="0.20">0.20</option>
+        <option value="0.10">0.10</option>
+        <option value="0.05" selected="selected">0.05</option>
+        <option value="0.01">0.01</option>
+    </select>
+    </p>
+</div>
+
+<div id="testoutput" aria-live="polite">
+    <p id='criticalValue' class='mathjaxCenter'></p>
+    <p id='test_stat' class='mathjaxCenter'></p>
+    <p id='p_value' class='mathjaxCenter'></p>
+    <br>
+    <div id='pdfPlot' aria-label="Probability density function plot" role="figure"></div>
+</div>
+
+<br>
+
+<div style="display: flex; margin-bottom: 5px; justify-content: space-between; align-items: center; margin-top: 15px; padding: 0 5px;">
+    <p id='showeqp' class='small' style="margin: 0;">
+        <label>Show equations
+        <input id="showeq" type="checkbox" value="showeqvalue" aria-label="Show equations" style="width: auto; margin-right: 5px; vertical-align: middle;"
+            onchange="
+                pInference(this.form.n.value, 
+                    this.form.phat.value, 
+                    1-this.form.conflevel.value,
+                    this.form.Hainput.value, 
+                    this.form.Haselect.value, 
+                    this.form.signiflevel.value, 
+                    this.form.testType.value);
+            "></label>
+    </p>
+
+    <div>
+        <input id="refreshbutton" type="button" value="Refresh" aria-label="Refresh calculations" style="width: auto; cursor: pointer; padding: 2px 10px; margin-right: 0;" onclick="
+            if(allValid(this.form.n.value, this.form.phat.value)) {
+                pInference(this.form.n.value, 
+                    this.form.phat.value, 
+                    1-this.form.conflevel.value,
+                    this.form.Hainput.value, 
+                    this.form.Haselect.value, 
+                    this.form.signiflevel.value, 
+                    this.form.testType.value);
+            }
+        ">
+    </div>
+</div>
+
+</form>
+</div>
+
+</main>
+    
+<footer>
+<div id="footerleft">
+<div id="flip1"><button aria-expanded="false" aria-controls="panel1" style="cursor: pointer;">Help</button></div>
+</div>
+<div id="footerright">
+<p class='small'>
+&copy;2026 Matt Bognar<br>
+</p>
+</div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Information">
+<p>
+This applet computes performs inference for a population proportion $p$.
+</p>
+
+<h4>Directions</h4>
+<ul>
+<li>Enter the sample size in the $n$ box and enter the sample proportion in the $\hat{p}$ box (i.e. $\hat{p}$ is the number of successes divided by $n$).</li>
+<li>Hitting "Tab" or "Enter" on your keyboard will compute a 95% confidence interval for $p$ (you can change the confidence level using the drop-down box).</li>
+<li>Via the drop-down box, you can choose either the Wald, Score, or Agresti-Coull inference method (the latter two are superior to Wald).
+</ul>
+
+<p>To perform a hypothesis test for $p$, enter $H_0$ and $H_a$. Specify the null and alternative hypotheses with the drop-down boxes. The critical value, rejection region, test statistic, and $p-$value are computed and graphed. Different significance levels can be chosen with the drop-down box.
+</p>
+</div>
+
+</body>
+</html>
+

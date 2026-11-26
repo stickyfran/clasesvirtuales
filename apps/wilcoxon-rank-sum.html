@@ -1,0 +1,218 @@
+<!-- // Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!--------------------------------------------------- -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Wilcoxon Rank Sum Test</title>
+<meta name="viewport" content="width=device-width">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<script src="common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+<script src="wilcoxon-rank-sum.object.js"></script>
+
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+google.charts.load('current', {'packages':['corechart']});
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-21570114-2']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-40ZCT9CYKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-40ZCT9CYKC');
+</script>
+</head>
+
+<body>
+
+<main>
+<h3>Wilcoxon Rank Sum Test</h3>
+
+<div>
+<form id="wrsForm">
+<table role="presentation">
+	<tr>
+		<td>$n_1 = $</td>
+		<td><input TYPE="TEXT" NAME="n1" SIZE="7" aria-label="Sample size 1"
+			VALUE=""
+			ONCHANGE="
+				var val = (this.value === '') ? NaN : eval(this.value);
+				if(!isNaN(val) && (val < 1 || val != parseInt(val))) {
+					alert('Error: Choose n1=1,2,3,...');
+					this.value = '';
+				}
+				else {
+					var n2Val = (this.form.n2.value === '') ? NaN : eval(this.form.n2.value);
+					if(!isNaN(val) && !isNaN(n2Val)) {
+						if(val + n2Val > 30) {
+							alert('Warning: Computing exact pmf for n1+n2 > 30 is computationally intensive. Use normal approximation.');
+							this.value = '';
+						} else {
+							wrs = new wrsDistribution(val, n2Val);
+							wrs.plotPmf();
+							wrs.printMoments();
+							this.form.w.value='';
+							this.form.prob.value='';
+						}
+					};
+				};">
+		</td>
+
+		<td>$n_2 = $</td>
+		<td><input TYPE="TEXT" NAME="n2" SIZE="7" aria-label="Sample size 2"
+			VALUE=""
+			ONCHANGE="
+				var val = (this.value === '') ? NaN : eval(this.value);
+				if(!isNaN(val) && (val < 1 || val != parseInt(val))) {
+					alert('Error: Choose n2=1,2,3,...');
+					this.value = '';
+				}
+				else {
+					var n1Val = (this.form.n1.value === '') ? NaN : eval(this.form.n1.value);
+					if(!isNaN(val) && !isNaN(n1Val)) {
+						if(val + n1Val > 30) {
+							alert('Warning: Computing exact pmf for n1+n2 > 30 is computationally intensive. Use normal approximation.');
+							this.value = '';
+						} else {
+							wrs = new wrsDistribution(n1Val, val);
+							wrs.plotPmf();
+							wrs.printMoments();
+							this.form.w.value='';
+							this.form.prob.value='';
+						}
+					};
+				};">
+		</td>
+	</tr>
+    
+	<tr>
+		<td>$w_1=$</td>
+		<td><input TYPE="TEXT" NAME="w" SIZE="7" aria-label="Rank sum statistic w1"
+		VALUE=""
+		ONCHANGE="
+			var val = (this.value === '') ? NaN : eval(this.value);
+			var n1 = (this.form.n1.value === '') ? 0 : eval(this.form.n1.value);
+			var n2 = (this.form.n2.value === '') ? 0 : eval(this.form.n2.value);
+			var minW = n1*(n1+1)/2;
+			var maxW = minW + n1*n2;
+			if(!isNaN(val) && (val < minW || val > maxW || val != parseInt(val))) {
+				alert('Error: Choose w1 between ' + minW + ' and ' + maxW);
+				this.value = '';
+			}
+			else if(!isNaN(val)) {
+				if(this.form.mydropdown.value == 'eq'){
+					wrs.plotPmf(val,0);
+					this.form.prob.value = roundNumber(wrs.pmf(val),5);
+				}
+				if(this.form.mydropdown.value == 'le'){
+					wrs.plotPmf(val,1);
+					this.form.prob.value = roundNumber(wrs.cdf(val),5);
+				}
+				if(this.form.mydropdown.value == 'ge'){
+					wrs.plotPmf(val,2);
+					this.form.prob.value = roundNumber(1-wrs.cdf(val-1),5);
+				}
+			};">
+		</td>
+
+		<th><select name="mydropdown" aria-label="Probability type"
+		ONCHANGE="
+					var wVal = (this.form.w.value === '') ? NaN : eval(this.form.w.value);
+					if(!isNaN(wVal)){
+						if(this.value == 'eq'){
+							wrs.plotPmf(wVal,0);
+							this.form.prob.value = roundNumber(wrs.pmf(wVal),5);
+						}
+						if(this.value == 'le'){
+							wrs.plotPmf(wVal,1);
+							this.form.prob.value = roundNumber(wrs.cdf(wVal),5);
+						}
+						if(this.value == 'ge'){
+							wrs.plotPmf(wVal,2);
+							this.form.prob.value = roundNumber(1-wrs.cdf(wVal-1),5);
+						}
+					}">
+		<option value="eq">P(W&#8321; = w&#8321;) =</option>
+		<option value="le">P(W&#8321; &le; w&#8321;) =</option>
+		<option value="ge">P(W&#8321; &ge; w&#8321;) =</option>
+		</select></th>
+
+		<td><input TYPE="TEXT" NAME="prob" SIZE="7" aria-label="Probability result"
+		VALUE="" readonly
+		STYLE="background-color: #e7b0b0"></td>
+	</tr>
+  </table>
+</form>
+</div>
+
+<div id="pmfPlot" role="figure" aria-label="Probability mass function plot"></div>
+
+<div aria-live="polite">
+<p id="moments" class="mathjaxMoments"></p>
+</div>
+</main>
+
+<footer>
+<div id="footerleft">
+<div id="flip1"><button aria-expanded="false" aria-controls="panel1">Help</button></div>
+</div>
+<div id="footerright">
+<p class='small'>&copy;2026 Matt Bognar</p>
+</div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Content">
+<p>
+This applet computes probabilities for the Wilcoxon Rank Sum Test. 
+The Wilcoxon rank sum statistic $W_1$ is the sum of the ranks in the first sample.
+</p>
+<h4>Directions</h4>
+<ul>
+<li>Enter $n_1$ and $n_2$ (total $n \le 30$ for exact pmf).</li>
+<li>The plot shows the PMF of $W_1$ under the null hypothesis.</li>
+</ul>
+</div>
+</body>
+</html>
+

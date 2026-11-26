@@ -1,0 +1,177 @@
+<!-- // Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!--------------------------------------------------- -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Wilcoxon Signed Rank Test</title>
+<meta name="viewport" content="width=device-width">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<script src="common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+<script src="wilcoxon-signed-rank.object.js"></script>
+
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+google.charts.load('current', {'packages':['corechart']});
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-21570114-2']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</head>
+
+<body>
+
+<main>
+<h3>Wilcoxon Signed Rank Test</h3>
+
+<div>
+<form id="wilForm">
+<table role="presentation">
+	<tr>
+		<td>$n = $</td>
+		<td><input TYPE="TEXT" NAME="n" SIZE="7" aria-label="Sample size n"
+			VALUE=""
+			ONCHANGE="
+				var val = (this.value === '') ? NaN : eval(this.value);
+				if(!isNaN(val) && (val < 1 || val != parseInt(val))) {
+					alert('Error: Choose n=1,2,3,...');
+					this.value = '';
+				}
+				else if(!isNaN(val) && val > 20) {
+					alert('Warning: Computing the exact pmf when n>20 is extremely computational. Use the normal approximation.');
+					this.value = '';
+				}
+				else if(!isNaN(val)) {
+					wil = new wilcoxonDistribution(val);
+					wil.plotPmf();
+					wil.printMoments();
+					this.form.x.value='';
+					this.form.prob.value='';
+				};">
+		</td>
+	</tr>
+    
+	<tr>
+		<td>$w=$</td>
+		<td><input TYPE="TEXT" NAME="x" SIZE="7" aria-label="Wilcoxon statistic w"
+		VALUE=""
+		ONCHANGE="
+			var val = (this.value === '') ? NaN : eval(this.value);
+			var nVal = (this.form.n.value === '') ? 0 : eval(this.form.n.value);
+			if(!isNaN(val) && (val < 0 || val > (nVal*(nVal+1)/2) || val != parseInt(val))) {
+				alert('Error: Choose w=0,1,...,n(n+1)/2');
+				this.value = '';
+			}
+			else if(!isNaN(val)) {
+				if(this.form.mydropdown.value == 'eq'){
+					wil.plotPmf(val,0);
+					this.form.prob.value = roundNumber(wil.pmf(val),5);
+				}
+				if(this.form.mydropdown.value == 'le'){
+					wil.plotPmf(val,1);
+					this.form.prob.value = roundNumber(wil.cdf(val),5);
+				}
+				if(this.form.mydropdown.value == 'ge'){
+					wil.plotPmf(val,2);
+					this.form.prob.value = roundNumber(1-wil.cdf(val-1),5);
+				}
+			};">
+		</td>
+
+		<th><select name="mydropdown" aria-label="Probability type"
+		ONCHANGE="
+					var wVal = (this.form.x.value === '') ? NaN : eval(this.form.x.value);
+					if(!isNaN(wVal)){
+						if(this.value == 'eq'){
+							wil.plotPmf(wVal,0);
+							this.form.prob.value = roundNumber(wil.pmf(wVal),5);
+						}
+						if(this.value == 'le'){
+							wil.plotPmf(wVal,1);
+							this.form.prob.value = roundNumber(wil.cdf(wVal),5);
+						}
+						if(this.value == 'ge'){
+							wil.plotPmf(wVal,2);
+							this.form.prob.value = roundNumber(1-wil.cdf(wVal-1),5);
+						}
+					}">
+		<option value="eq">P(W = w) =</option>
+		<option value="le">P(W &le; w) =</option>
+		<option value="ge">P(W &ge; w) =</option>
+		</select></th>
+
+		<td><input TYPE="TEXT" NAME="prob" SIZE="7" aria-label="Probability result"
+		VALUE="" readonly
+		STYLE="background-color: #e7b0b0"></td>
+	</tr>
+  </table>
+</form>
+</div>
+
+<div id="pmfPlot" role="figure" aria-label="Probability mass function plot"></div>
+
+<div aria-live="polite">
+<p id="moments" class="mathjaxMoments"></p>
+</div>
+</main>
+
+<footer>
+<div id="footerleft">
+<div id="flip1"><button aria-expanded="false" aria-controls="panel1">Help</button></div>
+</div>
+<div id="footerright">
+<p class='small'>&copy;2026 Matt Bognar</p>
+</div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Information">
+<p>
+This applet computes probabilities for the Wilcoxon signed rank test. 
+The Wilcoxon signed rank statistic $W$ is the sum of the
+ranks of the absolute values of the positive observations.
+</p>
+<h4>Directions</h4>
+<ul>
+<li>Enter the sample size $n$ (max 20 for exact calculation).</li>
+<li>The plot shows the probability mass function (pmf) under the null hypothesis.</li>
+</ul>
+</div>
+</body>
+</html>
+

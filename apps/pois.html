@@ -1,0 +1,228 @@
+<!--Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!----------------------------------------------------->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Poisson Distribution Applet/Calculator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+<script src="common.js"></script>
+<script src="pois.object.js"></script>
+
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true
+  },
+  options: {
+    enableMenu: true // This allows users to right-click for accessibility features
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+	
+<script type="text/javascript">
+// Help Panel with ARIA Accessibility Update
+$(document).ready(function(){
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+// Tooltip
+$(function() {
+$("#bulb img[title]").tooltip({
+   offset: [0, 120],
+   effect: 'fade'
+// add dynamic plugin with optional configuration for bottom edge
+}).dynamic({ bottom: { direction: 'down', bounce: true } });
+});
+
+// Load the Visualization API
+google.load('visualization', '1', {'packages':['corechart']});
+
+// Google Analytics
+var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-21570114-2']);
+	_gaq.push(['_trackPageview']);
+
+(function() 
+{
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + 
+		'.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+}
+)();
+
+$(document).ready(function(){
+  $("input").change(function(){
+      //alert("The text has been changed.");
+  });
+});
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-40ZCT9CYKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-40ZCT9CYKC');
+</script>
+</head>
+
+<body>
+
+<main>
+<h3>Poisson Distribution<br>$X \sim Pois(\lambda)$</h3>
+
+<div>
+<form NAME="this.form">
+  <table role="presentation">
+	<tr>
+		<td>$\lambda=$</td>
+		<td><input TYPE="text" NAME="lambda" VALUE="" aria-label="Rate lambda"
+			ONCHANGE="
+				if(eval(this.form.lambda.value) <= 0 || eval(this.form.lambda.value) > 5000) {
+					alert('Error: Choose 0 < \u03BB < 5000 (or use normal approximation)');
+					this.form.lambda.value = '';
+				}
+				else {
+					pois = new poissonDistribution(this.form.lambda.value);
+					pois.plotPmf();
+					pois.printMoments();
+					this.form.x.value='';
+					this.form.prob.value='';}"></td>
+
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+    
+	<tr>
+		<td>$x=$</td>
+		<td><input TYPE="text" NAME="x" VALUE="" aria-label="Number of occurrences x"
+			ONCHANGE="
+				if(eval(this.form.x.value) < 0 || this.form.x.value != parseInt(this.form.x.value)) {
+					alert('Error: Choose x=0,1,2,...');
+					this.form.x.value = '';
+				}
+				else {
+					if(this.form.mydropdown.value == 'eq')
+					{
+						this.form.prob.value = roundNumber(pois.pmf(this.form.x.value),5);
+						pois.plotPmf(this.form.x.value,0);
+					};
+					if(this.form.mydropdown.value == 'le')
+					{
+						this.form.prob.value = roundNumber(pois.cdf(this.form.x.value),5);
+						pois.plotPmf(this.form.x.value,1);
+					};
+					if(this.form.mydropdown.value == 'ge')
+					{
+						this.form.prob.value = roundNumber(1.0-pois.cdf(this.form.x.value-1),5);
+						pois.plotPmf(this.form.x.value,2);
+					};
+				}"
+		></td>
+
+		<th><select name="mydropdown" aria-label="Select probability calculation type"
+		ONCHANGE="
+					if(this.form.mydropdown.value == 'eq')
+					{
+						this.form.prob.value = roundNumber(pois.pmf(this.form.x.value),5);
+						pois.plotPmf(this.form.x.value,0);
+					};
+					if(this.form.mydropdown.value == 'le')
+					{
+						this.form.prob.value = roundNumber(pois.cdf(this.form.x.value),5);
+						pois.plotPmf(this.form.x.value,1);
+					};
+					if(this.form.mydropdown.value == 'ge')
+					{
+						this.form.prob.value = roundNumber(1.0-pois.cdf(this.form.x.value-1),5);
+						pois.plotPmf(this.form.x.value,2);
+					};
+		">
+		<option value="eq">P(X&thinsp;=&thinsp;x)&thinsp;&thinsp;=</option>
+		<option value="le">P(X&thinsp;&#8804;&thinsp;x)&thinsp;&thinsp;=</option>
+		<option value="ge">P(X&thinsp;&#8805;&thinsp;x)&thinsp;&thinsp;=</option>
+		</select></th>
+
+		<td><div aria-live="polite"><input TYPE="text" NAME="prob" VALUE="" readonly aria-label="Calculated probability" STYLE="background-color: #e7b0b0"></div></td>
+	</tr>
+  </table>
+</form>
+</div>
+
+<div id="pmfPlot" aria-label="Probability mass function plot" role="figure"></div>
+
+<div id="mom" aria-live="polite">
+<p id="moments" class="mathjaxMoments"></p>
+</div>
+</main>
+
+<footer>
+<div id="footerleft">
+<div id="flip1"><button aria-expanded="false" aria-controls="panel1">Help</button></div>
+</div>
+<div id="footerright">
+<p class='small'>
+&copy;2026 Matt Bognar, PhD<br>
+</p>
+</div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Information">
+<p>
+This applet computes probabilities for the Poisson distribution:
+$$X \sim Pois(\lambda)$$</p>
+
+<h4>Directions</h4>
+<ul>
+<li>Enter the rate in the $\lambda$ box.</li>
+<li>Hitting "Tab" or "Enter" on your keyboard will plot the probability mass function (pmf).</li>
+</ul>
+
+<p>To compute a probability, select $P(X=x)$ from the drop-down box, 
+enter a numeric $x$ value, and press "Enter" on your keyboard. The probability 
+$P(X=x)$ will appear in the
+<span style="BACKGROUND-COLOR: #FFCCCC">pink</span> box.
+Select $P(X \leq x)$ from the drop-down box for a left-tail probability (this is the cdf).</p>
+
+<h4>Details</h4>
+<ul>
+<li>$f(x)=P(X=x)=\frac{e^{-\lambda}\lambda^x}{x!}$<br>for $x=0,1,2,\ldots$</li>
+<li>$\mu=E(X)=\lambda$</li>
+<li>$\sigma^2=Var(X)=\lambda$</li>
+<li>$\sigma=SD(X)=\sqrt{\lambda}$</li>
+</ul>
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,250 @@
+<!--Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!----------------------------------------------------->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Negative Binomial Distribution Applet/Calculator (II)</title>
+<meta name="viewport" content="width=device-width">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+<!-- <script src="jstat.js"></script> -->
+<script src="common.js"></script>
+<script src="nb2.object.js"></script>
+
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true
+  },
+  options: {
+    enableMenu: true // This allows users to right-click for accessibility features
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+	
+<script type="text/javascript">
+// Help Panel with ARIA Accessibility Update
+$(document).ready(function(){
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+// Tooltip
+$(function() {
+$("#bulb img[title]").tooltip({
+   offset: [0, 120],
+   effect: 'fade'
+// add dynamic plugin with optional configuration for bottom edge
+}).dynamic({ bottom: { direction: 'down', bounce: true } });
+});
+
+// Load the Visualization API and the piechart package.
+google.load('visualization', '1', {'packages':['corechart']});
+
+// Google Analytics
+var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-21570114-2']);
+	_gaq.push(['_trackPageview']);
+
+(function() 
+{
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + 
+		'.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+}
+)();
+
+$(document).ready(function(){
+	$("input").change(function(){
+		//alert("The text has been changed.");
+	});
+});
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-40ZCT9CYKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-40ZCT9CYKC');
+</script>
+</head>
+
+<body>
+
+<main>
+<h3>Negative Binomial Distribution<br>$X \sim NB(r, p)\ (II)$</h3>
+
+<div>
+<form NAME="this.form">
+  <table role="presentation">
+	<tr>
+		<td>$r=$</td>
+		<td><input TYPE="TEXT" NAME="r" VALUE="" aria-label="Number of successes r"
+			ONCHANGE="
+				if(eval(this.form.r.value) < 1 
+					|| this.form.r.value != parseInt(this.form.r.value)) {
+					alert('Error: Choose r=1,2,3,...');
+					this.form.r.value = '';
+				}
+				else {
+					if(!isNaN(eval(this.form.p.value)))
+					{
+						nb = new negativeBinomialDistribution(this.form.r.value, this.form.p.value);
+						nb.plotPmf();
+						nb.printMoments();
+						this.form.x.value='';
+						this.form.prob.value='';
+					};
+				};">
+		</td>
+
+		<td>$p=$</td>
+		<td><input TYPE="TEXT" NAME="p" VALUE="" aria-label="Probability of success p"
+			ONCHANGE="
+				if(eval(this.form.p.value) <= 0 || eval(this.form.p.value) > 1) {
+					alert('Error: Probability of success must be in (0,1]');
+					this.form.p.value = '';
+				}
+				else {
+					if(!isNaN(eval(this.form.r.value)))
+					{
+						nb = new negativeBinomialDistribution(this.form.r.value, this.form.p.value);
+						nb.plotPmf();
+						nb.printMoments();
+						this.form.x.value='';
+						this.form.prob.value='';
+					};
+				};">
+		</td>
+		<td></td>
+	</tr>
+    
+	<tr>
+		<td>$x=$</td>
+		<td><input TYPE="TEXT" NAME="x" VALUE="" aria-label="Trial on which the r-th success occurs x"
+		ONCHANGE="
+			if(eval(this.form.x.value) < eval(this.form.r.value)
+			|| this.form.x.value != parseInt(this.form.x.value)) {
+				alert('Error: Choose x=r,r+1,...');
+				this.form.x.value = '';
+			}
+			else {
+				if(this.form.mydropdown.value == 'eq') {
+					this.form.prob.value = roundNumber(nb.pmf(this.form.x.value),5);
+					nb.plotPmf(this.form.x.value,0);
+				}
+				if(this.form.mydropdown.value == 'le') {
+					this.form.prob.value = roundNumber(nb.cdf(this.form.x.value),5);
+					nb.plotPmf(this.form.x.value,1);
+				}
+				if(this.form.mydropdown.value == 'ge') {
+					this.form.prob.value = roundNumber(1.0-nb.cdf(this.form.x.value-1),5);
+					nb.plotPmf(this.form.x.value,2);
+				}		
+			};"
+		></td>
+
+		<th><select name="mydropdown" aria-label="Select probability calculation type"
+		ONCHANGE="
+				if(this.form.mydropdown.value == 'eq') {
+					this.form.prob.value = roundNumber(nb.pmf(this.form.x.value),5);
+					nb.plotPmf(this.form.x.value,0);
+				}
+				if(this.form.mydropdown.value == 'le') {
+					this.form.prob.value = roundNumber(nb.cdf(this.form.x.value),5);
+					nb.plotPmf(this.form.x.value,1);
+				}
+				if(this.form.mydropdown.value == 'ge') {
+					this.form.prob.value = roundNumber(1.0-nb.cdf(this.form.x.value-1),5);
+					nb.plotPmf(this.form.x.value,2);
+				}		
+		">
+		<option value="eq">P(X&thinsp;=&thinsp;x)&thinsp;&thinsp;=</option>
+		<option value="le">P(X&thinsp;&#8804;&thinsp;x)&thinsp;&thinsp;=</option>
+		<option value="ge">P(X&thinsp;&#8805;&thinsp;x)&thinsp;&thinsp;=</option>
+		</select></th>
+
+		<td><div aria-live="polite"><input TYPE="TEXT" NAME="prob" VALUE="" readonly aria-label="Calculated probability" STYLE="background-color: #e7b0b0"></div></td>
+	</tr>
+  </table>
+</form>
+</div>
+
+<div id="pmfPlot" aria-label="Probability mass function plot" role="figure"></div>
+
+<div aria-live="polite">
+<p id="moments" class="mathjaxMoments"></p>
+</div>
+</main>
+
+<footer>
+<div id="footerleft">
+<div id="flip1"><button aria-expanded="false" aria-controls="panel1">Help</button></div>
+</div>
+<div id="footerright">
+<p class='small'>
+&copy;2026 Matt Bognar, PhD<br>
+</p>
+</div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Information">
+<p>This applet computes probabilities for the negative binomial distribution $$X \sim NB(r, p)$$ where
+$$X = \mathrm{the\ trial\ on\ which\ the}\ r^{th}\ \mathrm{success\ occurs}$$</p>
+
+<h4>Directions</h4>
+<ul>
+<li>Enter the number of successes in the $r$ box.</li>
+<li>Enter the probability of success in the $p$ box.</li>
+<li>Hitting "Tab" or "Enter" on your keyboard will plot the probability mass function (pmf).</li>
+</ul>
+
+<p>To compute a probability, select $P(X=x)$ from the drop-down box, 
+enter a numeric $x$ value, and press "Enter" on your keyboard. The probability 
+$P(X=x)$ will appear in the
+<span style="background-color: #FFCCCC">pink</span> box.
+Select $P(X \leq x)$ from the drop-down box for a left-tail probability (this is the cdf).</p>
+
+<h4>Details</h4>
+<ul>
+<li>$f(x)=P(X=x)={x-1 \choose r-1}p^r(1-p)^{x-r}$</li>
+<ul>
+<li>$x=r,r+1,\ldots$</li>
+<li>$0 < p \le 1$</li>
+</ul>
+<li>$\mu=E(X)=\frac{r}{p}$</li>
+<li>$\sigma^2=Var(X)=\frac{r(1-p)}{p^2}$</li>
+<li>$\sigma=SD(X)=\sqrt{\frac{r(1-p)}{p^2}}$</li>
+</ul>
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,227 @@
+<!--Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!----------------------------------------------------->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>F-Distribution Applet/Calculator</title>
+<meta name="viewport" content="width=device-width">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<script src="common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+<script src="f.object.js"></script>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true
+  },
+  options: {
+    enableMenu: true // This allows users to right-click for accessibility features
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+<script>
+// Help Panel with ARIA Accessibility Update
+$(document).ready(function(){
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+// Tooltip
+$(function() {
+$("#bulb img[title]").tooltip({
+   offset: [0, 120],
+   effect: 'fade'
+}).dynamic({ bottom: { direction: 'down', bounce: true } });
+});
+
+// Load the Visualization API
+google.charts.load('current', {'packages':['corechart']});
+
+// Google Analytics
+var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-21570114-2']);
+	_gaq.push(['_trackPageview']);
+
+(function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + 
+		'.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+
+$(document).ready(function(){
+  $("input").change(function(){
+      //alert("The text has been changed.");
+  });
+});
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-40ZCT9CYKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-40ZCT9CYKC');
+</script>
+</head>
+
+<body>
+
+<main>
+<h3>F-Distribution<br>$X \sim F_{(\nu_1,\nu_2)}$</h3>
+
+<div>
+<form NAME="this.form">
+  <table role="presentation">
+    <tr>
+      <td>$\nu_1=$</td>
+      <td><input TYPE="TEXT" NAME="df1" aria-label="Numerator degrees of freedom nu 1"
+			VALUE=""
+			ONFOCUS="this.form.x.value = ''; 
+				this.form.p.value = ''; "
+			ONCHANGE="
+				if(!isNaN(eval(this.form.df2.value)))
+				{
+					f = new fDistribution(this.form.df1.value, this.form.df2.value);
+					f.printMoments();
+					f.printPdf(this.form.x.value, this.form.mydropdown.value);
+				};">
+	  </td>
+
+      <td>$\nu_2=$</td>
+      <td><input TYPE="TEXT" NAME="df2" aria-label="Denominator degrees of freedom nu 2"
+			VALUE=""
+			ONFOCUS="this.form.x.value = ''; 
+				this.form.p.value = ''; "
+			ONCHANGE="
+				if(!isNaN(eval(this.form.df1.value)))
+				{
+					f = new fDistribution(this.form.df1.value, this.form.df2.value);
+					f.printMoments();
+					f.printPdf(this.form.x.value, this.form.mydropdown.value);
+				};">
+		</td>
+		<td></td>
+    </tr>
+    
+    <tr>
+      <td>$x=$</td>
+      <td><div aria-live="polite"><input TYPE="TEXT" NAME="x" aria-label="Value x"
+		VALUE=""
+		ONFOCUS="this.form.p.value=''"
+		ONCHANGE="
+			if(this.form.mydropdown.value == 'less')
+				this.form.p.value = roundNumber(f.cdf(eval(this.form.x.value)),5);
+			if(this.form.mydropdown.value == 'greater')
+				this.form.p.value = roundNumber(1-f.cdf(eval(this.form.x.value)),5);
+			f.printPdf(eval(this.form.x.value), this.form.mydropdown.value);"
+		STYLE="background-color: #b2caf6"></div></td>
+
+      <td><select name="mydropdown" aria-label="Select probability calculation type"
+      	ONCHANGE="
+			if(this.form.mydropdown.value == 'less')
+				this.form.p.value = roundNumber(f.cdf(eval(this.form.x.value)),5);
+			if(this.form.mydropdown.value == 'greater')
+				this.form.p.value = roundNumber(1-f.cdf(eval(this.form.x.value)),5);
+			f.printPdf(eval(this.form.x.value), this.form.mydropdown.value);">
+		<option value="greater">P(X&thinsp;&#62;&thinsp;x)=</option>
+		<option value="less">P(X&thinsp;&#60;&thinsp;x)=</option>
+		</select></td>
+
+      <td><div aria-live="polite"><input TYPE="TEXT" NAME="p" aria-label="Probability p"
+		VALUE=""
+		ONFOCUS="this.form.x.value=''"
+		ONCHANGE="
+			if((eval(this.form.p.value)<=0) || 
+				(eval(this.form.p.value)>=1) || 
+				isNaN(eval(this.form.p.value))) 
+			{
+				alert('Error: Probability must be between 0 and 1'); 
+				this.form.p.value = ''
+			}
+			else 
+			{
+				if(this.form.mydropdown.value == 'less')
+					this.form.x.value = roundNumber(f.percentile(eval(this.form.p.value)),5);
+				if(this.form.mydropdown.value == 'greater')
+					this.form.x.value = roundNumber(f.percentile(1-eval(this.form.p.value)),5);
+				f.printPdf(eval(this.form.x.value), this.form.mydropdown.value);
+			};"
+		STYLE="background-color: #e7b0b0"></div></td>
+    </tr>
+  </table>
+</form>
+</div>
+
+<div id="pdfPlot" aria-label="Probability density function plot" role="figure"></div>
+
+<div aria-live="polite">
+<p id="moments" class="mathjaxMoments"></p>
+</div>
+</main>
+
+<footer>
+<div id="footerleft">
+<div id="flip1"><button aria-expanded="false" aria-controls="panel1">Help</button></div>
+</div>
+<div id="footerright">
+<p class='small'>
+&copy;2026 Matt Bognar, PhD<br>
+</p>
+</div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Information">
+<p>
+This applet computes probabilities and percentiles for the F-distribution
+$X \sim F_{(\nu_{1},\nu_{2})}$.</p>
+
+<p>
+<em>Directions:</em>
+</p>
+<ul>
+<li>Enter the numerator degrees of freedom in the $\nu_1$ box.</li>
+<li>Enter the denominator degrees of freedom in the $\nu_2$ box. </li>
+<li><p>To compute a left-tail probability, select $P(X \lt x)$ from the drop-down box, enter a numeric $x$ value in the <span style="BACKGROUND-COLOR: #BABAFF">blue</span> (left) box and press the "Compute" button. The probability 
+$P(X \lt x)$ will appear in the <span style="BACKGROUND-COLOR: #FFCCCC">pink</span> (right) box.
+Select $P(X \gt x)$ from the drop-down box for a right-tail probability.</p></li>
+<li><p>To determine a percentile, enter the percentile (e.g. use 0.8 for the 80th percentile) in the 
+<span style="BACKGROUND-COLOR: #FFCCCC">pink</span> (right) box, select $P(X \lt x)$ from the drop-down box, and press the "Compute" button. The percentile $x$ will appear in the 
+<span style="BACKGROUND-COLOR: #BABAFF">blue</span> (left) box.</p></li>
+</ul>
+
+<p>On the graph, the $x$ value appears in 
+<span style="BACKGROUND-COLOR: #BABAFF">blue</span>
+while the probability is shaded in 
+<span style="BACKGROUND-COLOR: #FFCCCC">pink</span>.
+</p>
+</div>
+
+</body>
+</html>
+

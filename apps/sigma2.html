@@ -1,0 +1,350 @@
+<!--Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!----------------------------------------------------->
+
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Inference for &#963;&sup2;</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<script src="common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+<script src="sigma2.object.js"></script>
+<script src="chisqinference.object.js"></script>
+
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    },
+    svg: {
+      fontCache: 'global'
+    }
+  };
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+// Help Panel
+$(document).ready(function(){
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+// Tooltip
+$(function() {
+$("#bulb img[title]").tooltip({
+   offset: [0, 120],
+   effect: 'fade'
+}).dynamic({ bottom: { direction: 'down', bounce: true } });
+});
+
+// Load the Visualization API
+google.charts.load('current', {'packages':['corechart']});
+
+// Google Analytics
+var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-21570114-2']);
+    _gaq.push(['_trackPageview']);
+
+(function() 
+{
+    var ga = document.createElement('script'); 
+    ga.type = 'text/javascript'; 
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + 
+        '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; 
+    s.parentNode.insertBefore(ga, s);
+}
+)();
+
+$(document).ready(function(){
+    $("#tabs").tabs({
+        activate: function (event, ui) {
+            var active = $('#tabs').tabs('option', 'active');
+            $("#tabid").html('the tab id is ' + $("#tabs ul>li a").eq(active).attr("href"));
+        }
+    });
+});
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-40ZCT9CYKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-40ZCT9CYKC');
+</script>
+</head>
+
+<body onload="
+    $('#ci').hide(0);
+    $('#test').hide(0);
+    $('#testoutput').hide(0);
+">
+
+<script>
+function nValid(n) {
+    if(n === '' || n === null) return false;
+    var num = eval(n);
+    if(isNaN(num) || num < 1 || num != parseInt(num)) {
+        return false;
+    }
+    else return true;
+}
+
+function s2Valid(s2) {
+    if(s2 === '' || s2 === null) return false;
+    var num = eval(s2);
+    if(isNaN(num) || num <= 0) {
+        return false;
+    }
+    else return true;
+}
+
+function allValid(n, s2) {
+    if(nValid(n) && s2Valid(s2)) {
+        $('#ci').show(700);
+        $('#test').show(700);
+        $('#testoutput').show(700);
+        return true;
+    }
+    else {
+        $('#ci').hide(700);
+        $('#test').hide(700);
+        $('#testoutput').hide(700);
+        return false;
+    }
+}
+
+function h0haValid(h0, ha) {
+    if(h0 === '' || ha === '') return false;
+    if(isNaN(eval(h0)) || isNaN(eval(ha))) return false;
+    $('#testoutput').show(700);
+    return true;
+}
+</script>
+
+<main>
+<h3>Statistical Inference for $\sigma^2$</h3>
+
+<div>
+<form id="sigmaForm">
+<table role="presentation">
+    <tr>
+        <td><span aria-hidden="true">$n=$</span></td>
+        <td><input TYPE="TEXT" NAME="n" SIZE="7" ID="n" aria-label="Sample size n"
+            VALUE=""
+            ONCHANGE="
+                if(!nValid(this.value) && this.value !== '') {
+                    alert('Error: Choose n=1,2,3,...');
+                    this.value = '';
+                }
+                if(allValid(this.form.n.value, this.form.s2.value)) {
+                    s2Inference(this.form.n.value, this.form.s2.value,  
+                        1-this.form.conflevel.value, this.form.citype.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value);
+                }
+            ">
+        </td>
+        <td><span aria-hidden="true">$s^2=$</span></td>
+        <td><input TYPE="TEXT" NAME="s2" SIZE="7" id="s2" aria-label="Sample variance s squared"
+            VALUE=""
+            ONCHANGE="
+                if(!s2Valid(this.value) && this.value !== '') {
+                    alert('Error: Enter a numeric value > 0');
+                    this.value = '';
+                }
+                if(allValid(this.form.n.value, this.form.s2.value)) {
+                    s2Inference(this.form.n.value, this.form.s2.value, 
+                        1-this.form.conflevel.value, this.form.citype.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value);
+                }
+                ">
+        </td>
+    </tr>
+</table>
+
+<div id='ci' aria-live="polite">
+<p class="mathjaxCenter">
+<select name="conflevel" aria-label="Confidence level"
+    ONCHANGE="                  
+        s2Inference(this.form.n.value, this.form.s2.value,  
+            1-this.value, this.form.citype.value, 
+            this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value);
+        ">
+    <option value="0.80">80%</option>
+    <option value="0.90">90%</option>
+    <option value="0.95" selected="selected">95%</option>
+    <option value="0.99">99%</option>
+    </select>
+<select name="citype" aria-label="Confidence interval type"
+    ONCHANGE="                  
+        s2Inference(this.form.n.value, this.form.s2.value,  
+            1-this.form.conflevel.value, this.value, 
+            this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value);
+        ">
+    <option value="ci" selected="selected">CI</option>
+    <option value="upper">upper bound</option>
+    <option value="lower">lower bound</option>
+    </select>
+for $\sigma^2$: <span id="ci_output" class="mathjaxCI"></span></p>
+</div>
+
+<div id="test">
+    <p class="mathjaxCenter"><span aria-hidden="true">$H_0:\sigma^2$</span>
+    <select name="H0select" aria-label="Null hypothesis operator"
+        ONCHANGE="
+            if(this.value == 'eq') this.form.Haselect.value = 'neq';
+            if(this.value == 'le') this.form.Haselect.value = 'gt';
+            if(this.value == 'ge') this.form.Haselect.value = 'lt';
+            s2Inference(this.form.n.value, this.form.s2.value, 
+                1-this.form.conflevel.value, this.form.citype.value, 
+                this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value);
+        ">
+        <option value="eq" selected="selected">=</option>
+        <option value="ge">&#8805;</option>
+        <option value="le">&#8804;</option>
+        </select>
+    <input TYPE="TEXT" NAME="H0input" SIZE="7" PLACEHOLDER="&sigma;&sup2;&#8320;" aria-label="Null variance value"
+            VALUE=""
+            ONCHANGE="
+                this.form.Hainput.value = this.value;
+                if(h0haValid(this.value, this.form.Hainput.value)) {
+                    s2Inference(this.form.n.value, this.form.s2.value,  
+                        1-this.form.conflevel.value, this.form.citype.value, 
+                        this.value, this.form.Haselect.value, this.form.signiflevel.value);
+                } else if (this.value !== '') {
+                    alert('Error: Enter a numeric value for H0');
+                    this.value = ''; this.form.Hainput.value = '';
+                }
+    "><br>
+    <span aria-hidden="true">$H_a:\sigma^2$</span>
+    <select name="Haselect" aria-label="Alternative hypothesis operator"
+        ONCHANGE="
+            if(this.value == 'neq') this.form.H0select.value = 'eq';
+            if(this.value == 'gt') this.form.H0select.value = 'le';
+            if(this.value == 'lt') this.form.H0select.value = 'ge';
+            s2Inference(this.form.n.value, this.form.s2.value,  
+                1-this.form.conflevel.value, this.form.citype.value, 
+                this.form.H0input.value, this.value, this.form.signiflevel.value);
+        ">
+        <option value="neq" selected="selected">&#8800;</option>
+        <option value="gt">&gt;</option>
+        <option value="lt">&lt;</option>
+        </select>
+    <input TYPE="TEXT" NAME="Hainput" SIZE="7" PLACEHOLDER="&sigma;&sup2;&#8320;" aria-label="Alternative variance value"
+            VALUE=""
+            ONCHANGE="
+                this.form.H0input.value = this.value;
+                if(h0haValid(this.form.H0input.value, this.value)) {
+                    s2Inference(this.form.n.value, this.form.s2.value, 
+                        1-this.form.conflevel.value, this.form.citype.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value);
+                } else if (this.value !== '') {
+                    alert('Error: Enter a numeric value for Ha');
+                    this.form.H0input.value = ''; this.value = '';
+                }
+        "></p>
+
+    <p class="mathjaxCenter">
+    <label for="signiflevelSelect">Significance level: $\alpha =$</label>
+    <select id="signiflevelSelect" name="signiflevel" aria-label="Significance level alpha"
+        ONCHANGE="s2Inference(this.form.n.value, this.form.s2.value,  
+                1-this.form.conflevel.value, this.form.citype.value, 
+                this.form.H0input.value, this.form.Haselect.value, this.value);
+            ">
+        <option value="0.20">0.20</option>
+        <option value="0.10">0.10</option>
+        <option value="0.05" selected="selected">0.05</option>
+        <option value="0.01">0.01</option>
+    </select>
+    </p>
+    <p id='criticalValue' class='mathjaxCenter' aria-live="polite"></p>
+</div>
+
+<div id="testoutput" aria-live="polite">
+    <p id='test_stat' class='mathjaxCenter'></p>
+    <p id='p_value' class='mathjaxCenter'></p>
+    <br>
+    <div id='pdfPlot' role="figure" aria-label="Chi-square distribution plot"></div>
+</div>
+
+<div style="display: flex; margin-bottom: 5px; justify-content: space-between; align-items: center; margin-top: 15px; padding: 0 5px;">
+    <p class='small' style="margin: 0;">
+        <label>Show equations 
+        <input id="showeq" type="checkbox" value="showeqvalue" style="width: auto; margin-right: 5px; vertical-align: middle;" aria-label="Show equations" onchange="
+            s2Inference(this.form.n.value, this.form.s2.value,  
+                        1-this.form.conflevel.value, this.form.citype.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value);
+        "></label>
+    </p>
+
+    <div>
+        <input id="refreshbutton" type="button" value="Refresh" aria-label="Refresh calculations" style="width: auto; cursor: pointer; padding: 2px 10px; margin-right: 0;" onclick="
+            if(allValid(this.form.n.value, this.form.s2.value)) {
+                s2Inference(this.form.n.value, this.form.s2.value,  
+                    1-this.form.conflevel.value, this.form.citype.value, 
+                    this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value);
+            }
+        ">
+    </div>
+</div>
+</form>
+
+</div>
+</div>
+
+</main>
+    
+<footer>
+<div id="footerleft">
+<div id="flip1"><button aria-expanded="false" aria-controls="panel1" style="cursor: pointer;">Help</button></div>
+</div>
+<div id="footerright">
+<p class='small'>
+&copy;2026 Matt Bognar<br>
+</p>
+</div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Content">
+<p>
+This applet computes performs inference for a population variance $\sigma^2$. 
+</p>
+<h4>Assume</h4>
+<p>$X_i \stackrel{iid}{\sim} N(\mu,\sigma^2)$ for $i=1,\ldots,n$ ($\sigma^2$ is unknown).<br>
+Observed data is $x_1,\ldots,x_n$; sample variance is $s^2$.</p>
+<h4>Directions</h4>
+<ul>
+<li>Enter the sample size in the $n$ box.</li>
+<li>Enter the sample variance in the $s^2$ box.</li>
+<li>Hitting "Tab" or "Enter" will compute a confidence interval.</li>
+</ul>
+<p>To perform a hypothesis test, enter $H_0$ and $H_a$. The critical value, rejection region, test statistic, and $p$-value are computed and graphed.</p>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,227 @@
+<!--Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!----------------------------------------------------->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Runs Test Applet</title>
+<meta name="viewport" content="width=device-width">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<script src="common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+<script src="runs.object.js"></script>
+
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+// Help Panel
+$(document).ready(function(){
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+// Tooltip
+$(function() {
+$("#bulb img[title]").tooltip({
+   offset: [0, 120],
+   effect: 'fade'
+}).dynamic({ bottom: { direction: 'down', bounce: true } });
+});
+
+// Load the Visualization API
+google.charts.load('current', {'packages':['corechart']});
+
+// Google Analytics
+var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-21570114-2']);
+	_gaq.push(['_trackPageview']);
+
+(function() 
+{
+	var ga = document.createElement('script'); 
+	ga.type = 'text/javascript'; 
+	ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + 
+		'.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; 
+	s.parentNode.insertBefore(ga, s);
+}
+)();
+</script>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-40ZCT9CYKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-40ZCT9CYKC');
+</script>
+</head>
+
+<body>
+
+<main>
+<h3>Runs Test</h3>
+
+<div>
+<form id="runsForm">
+<table role="presentation">
+	<tr>
+		<td>$n_1 = $</td>
+		<td><input TYPE="TEXT" NAME="n1" SIZE="7" aria-label="Number of elements of type 1"
+			VALUE=""
+			ONCHANGE="
+				var val = (this.value === '') ? NaN : eval(this.value);
+				if(!isNaN(val) && (val < 0 || val != parseInt(val))) {
+					alert('Error: Choose n1=0,1,2,3,...');
+					this.value = '';
+				}
+				else {
+					var n2Val = (this.form.n2.value === '') ? NaN : eval(this.form.n2.value);
+					if(!isNaN(val) && !isNaN(n2Val)) {
+						bin = new runsDistribution(val, n2Val);
+						bin.plotPmf();
+						bin.printMoments();
+						this.form.x.value='';
+						this.form.prob.value='';
+					};
+				};">
+		</td>
+
+		<td>$n_2=$</td>
+		<td><input TYPE="TEXT" NAME="n2" SIZE="7" aria-label="Number of elements of type 2"
+			VALUE=""
+			ONCHANGE="
+				var val = (this.value === '') ? NaN : eval(this.value);
+				if(!isNaN(val) && (val < 0 || val != parseInt(val))) {
+					alert('Error: Choose n2=0,1,2,3,...');
+					this.value = '';
+				}
+				else {
+					var n1Val = (this.form.n1.value === '') ? NaN : eval(this.form.n1.value);
+					if(!isNaN(val) && !isNaN(n1Val))
+					{
+						bin = new runsDistribution(n1Val, val);
+						bin.plotPmf();
+						bin.printMoments();
+						this.form.x.value='';
+						this.form.prob.value='';
+					};
+				};">
+		</td>
+	</tr>
+    
+	<tr>
+		<td>$x=$</td>
+		<td><input TYPE="TEXT" NAME="x" SIZE="7" aria-label="Number of runs x"
+		VALUE=""
+		ONCHANGE="
+			var val = (this.value === '') ? NaN : eval(this.value);
+			var n1 = (this.form.n1.value === '') ? 0 : eval(this.form.n1.value);
+			var n2 = (this.form.n2.value === '') ? 0 : eval(this.form.n2.value);
+			if(!isNaN(val) && (val < 1 || val > (n1 + n2) || val != parseInt(val))) {
+				alert('Error: Choose x=1,...,n1+n2');
+				this.value = '';
+			}
+			else if(!isNaN(val)) {
+				if(this.form.mydropdown.value == 'eq'){
+					bin.plotPmf(val,0);
+					this.form.prob.value = roundNumber(bin.pmf(val),5);
+				}
+				if(this.form.mydropdown.value == 'le'){
+					bin.plotPmf(val,1);
+					this.form.prob.value = roundNumber(bin.cdf(val),5);
+				}
+				if(this.form.mydropdown.value == 'ge'){
+					bin.plotPmf(val,2);
+					this.form.prob.value = roundNumber(1-bin.cdf(val-1),5);
+				}
+			};">
+		</td>
+
+		<th><select name="mydropdown" aria-label="Probability type"
+		ONCHANGE="
+					var xVal = (this.form.x.value === '') ? NaN : eval(this.form.x.value);
+					if(!isNaN(xVal)){
+						if(this.value == 'eq'){
+							bin.plotPmf(xVal,0);
+							this.form.prob.value = roundNumber(bin.pmf(xVal),5);
+						}
+						if(this.value == 'le'){
+							bin.plotPmf(xVal,1);
+							this.form.prob.value = roundNumber(bin.cdf(xVal),5);
+						}
+						if(this.value == 'ge'){
+							bin.plotPmf(xVal,2);
+							this.form.prob.value = roundNumber(1-bin.cdf(xVal-1),5);
+						}
+					}">
+		<option value="eq">P(X = x) =</option>
+		<option value="le">P(X &le; x) =</option>
+		<option value="ge">P(X &ge; x) =</option>
+		</select></th>
+
+		<td><input TYPE="TEXT" NAME="prob" SIZE="7" aria-label="Resulting probability"
+		VALUE="" readonly
+		STYLE="background-color: #e7b0b0"></td>
+	</tr>
+  </table>
+</form>
+</div>
+
+<div id="pmfPlot" role="figure" aria-label="Probability Mass Function Plot"></div>
+
+<div aria-live="polite">
+<p id="moments" class="mathjaxMoments"></p>
+</div>
+</main>
+
+<footer>
+<div id="footerleft">
+<div id="flip1"><button aria-expanded="false" aria-controls="panel1">Help</button></div>
+</div>
+<div id="footerright">
+<p class='small'>
+&copy;2026 Matt Bognar<br>
+</p>
+</div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Information">
+<p>
+This applet computes probabilities for the Wald–Wolfowitz Runs Test.
+</p>
+<h4>Directions</h4>
+<ul>
+<li>Enter the number of events of type 1 ($n_1$) and type 2 ($n_2$).</li>
+<li>The plot shows the PMF assuming $H_0$ (randomness) is true.</li> 
+</ul>
+<p>Select the tail and enter $x$ to find the p-value or specific probability.</p>
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,580 @@
+<!--Copyright 2026 Matt Bognar-->
+<!--Written by:-->
+<!--Matt Bognar-->
+<!--Iowa, USA-->
+<!----------------------------------------------------->
+<!--This software may not be copied or re-distributed-->
+<!----------------------------------------------------->
+
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Inference for &#956;&#8321;-&#956;&#8322;</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<script src="common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+<script src="mu1mu2.object.js"></script>
+<script src="normalinference.object.js"></script>
+<script src="tinference.object.js"></script>
+
+<link type="text/css" rel="stylesheet" href="style.css">
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    },
+    svg: {
+      fontCache: 'global'
+    }
+  };
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+<script src="https://mabognar.github.io/apps/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+// Help Panel with ARIA Accessibility Update
+$(document).ready(function(){
+  $("#flip1 button").click(function(){
+    var expanded = $(this).attr("aria-expanded") === "true";
+    $(this).attr("aria-expanded", !expanded);
+    $("#panel1").slideToggle("fast");
+  });
+});
+
+// Tooltip
+$(function() {
+$("#bulb img[title]").tooltip({
+   offset: [0, 120],
+   effect: 'fade'
+}).dynamic({ bottom: { direction: 'down', bounce: true } });
+});
+
+// Load the Visualization API
+google.charts.load('current', {'packages':['corechart']});
+
+// Google Analytics
+var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-21570114-2']);
+    _gaq.push(['_trackPageview']);
+
+(function() 
+{
+    var ga = document.createElement('script'); 
+    ga.type = 'text/javascript'; 
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + 
+        '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; 
+    s.parentNode.insertBefore(ga, s);
+}
+)();
+
+$(document).ready(function(){
+    $("input").change(function(){
+        //alert("The text has been changed.");
+    });
+});
+
+$("#tabs").tabs({
+    activate: function (event, ui) {
+        var active = $('#tabs').tabs('option', 'active');
+        $("#tabid").html('the tab id is ' + $("#tabs ul>li a").eq(active).attr("href"));
+    }
+});
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-40ZCT9CYKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-40ZCT9CYKC');
+</script>
+</head>
+
+<body onload="
+        $('#ci').hide(0);
+        $('#test').hide(0);
+        $('#testoutput').hide(0);      
+">
+
+<!-- <body onload="
+        $('#ci').hide(0);
+        $('#test').hide(0);
+        $('#testoutput').hide(0);
+        $('#sd1sd2dropdown').hide(0);       
+        $('#assume').hide(0);       
+"> -->
+
+<script>
+function nValid(n) {
+    if(isNaN(n) || n < 1 || n != parseInt(n) || n === '') {
+        return false;
+    }
+    else return true;
+}
+
+function xbarValid(xbar) {
+    if(isNaN(xbar) || xbar === '') {
+        return false;
+    }
+    else return true;
+}
+
+function sdValid(sd) {
+    if(isNaN(sd) || sd <= 0 || sd === '') {
+        return false;
+    }
+    else return true;
+}
+
+function allValid(n1, x1bar, sd1, n2, x2bar, sd2) {
+    if(nValid(n1) && xbarValid(x1bar) && sdValid(sd1) &&
+        nValid(n2) && xbarValid(x2bar) && sdValid(sd2)) {
+        $('#ci').show(700);
+        $('#test').show(700);
+        $('#testoutput').show(700);
+        return true;
+    }
+    else {
+        $('#ci').hide(700);
+        $('#test').hide(700);
+        $('#testoutput').hide(700);
+        return false;
+    }
+}
+
+function h0Valid(h0) {
+    if(isNaN(h0) || h0 === '') {
+        return false;
+    }
+    else return true;
+}
+
+function haValid(ha) {
+    if(isNaN(ha) || ha === '') {
+        return false;
+    }
+    else return true;
+}
+
+function h0haValid(h0, ha) {
+    if(h0Valid(h0) && haValid(ha)) {
+        $('#testoutput').show(700);
+        return true;
+    }
+    else {
+        $('#testoutput').hide(700);
+        return false;
+    }
+}
+</script>
+
+<main>
+<h3>Statistical Inference for $\mu_1-\mu_2$<br></h3>
+
+<div>
+<form>
+
+<table role="presentation">
+    <tr>
+        <td><span aria-hidden="true">$n_1=$</span></td>
+        <td><input TYPE="TEXT" NAME="n1" SIZE="7" aria-label="Sample size 1"
+            VALUE=""
+            ONCHANGE="
+                if(!nValid(this.form.n1.value) && this.form.n1.value !== '') {
+                    alert('Error: Choose n1=1,2,3,...');
+                    this.form.n1.value = '';
+                }
+                if(allValid(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value, 
+                            this.form.n2.value, this.form.x2bar.value, this.form.sd2.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value, 
+                        1-this.form.conflevel.value, this.form.sd1dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+            ">
+        </td>
+        <td><span aria-hidden="true">$\bar{x}_1=$</span></td>
+        <td><input TYPE="TEXT" NAME="x1bar" SIZE="7" aria-label="Sample mean 1"
+            VALUE=""
+            ONCHANGE="
+                if(!xbarValid(this.form.x1bar.value) && this.form.x1bar.value !== '') {
+                    alert('Error: Choose a numeric x1bar value');
+                    this.form.x1bar.value = '';
+                }
+                if(allValid(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value, 
+                            this.form.n2.value, this.form.x2bar.value, this.form.sd2.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value, 
+                        1-this.form.conflevel.value, this.form.sd1dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+                ">
+        </td>
+        <td><select name="sd1dropdown" aria-label="Standard deviation type 1"
+            ONCHANGE="
+                if(this.form.sd1dropdown.value == 's1') {
+                    this.form.sd2dropdown.value = 's2';
+                    $('#sd1sd2dropdown').show(700);     
+                    $('#assume').show(700);     
+                }
+                else {
+                    this.form.sd2dropdown.value = 'sigma2';             
+                    $('#sd1sd2dropdown').hide(700);     
+                    $('#assume').hide(700);     
+                }
+                if(allValid(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value, 
+                            this.form.n2.value, this.form.x2bar.value, this.form.sd2.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                        1-this.form.conflevel.value, this.form.sd1dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+            ">
+            <option value="s1" selected="selected">s&#8321;=</option>
+            <option value="sigma1">&#963;&#8321;=</option>
+        </select></td>
+
+        <td><input TYPE="TEXT" NAME="sd1" SIZE="7" aria-label="Standard deviation 1"
+            VALUE=""
+            ONCHANGE="
+                if(!sdValid(this.form.sd1.value) && this.form.sd1.value !== '') {
+                    alert('Error: Choose sd1 > 0');
+                    this.form.sd1.value = '';
+                }
+                if(allValid(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value, 
+                            this.form.n2.value, this.form.x2bar.value, this.form.sd2.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                        1-this.form.conflevel.value, this.form.sd1dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+            ">
+        </td>
+    </tr>
+    
+    <tr>
+        <td><span aria-hidden="true">$n_2=$</span></td>
+        <td><input TYPE="TEXT" NAME="n2" SIZE="7" aria-label="Sample size 2"
+            VALUE=""
+            ONCHANGE="
+                if(!nValid(this.form.n2.value) && this.form.n2.value !== '') {
+                    alert('Error: Choose n2=1,2,3,...');
+                    this.form.n2.value = '';
+                }
+                if(allValid(this.form.n2.value, this.form.x2bar.value, this.form.sd2.value, 
+                            this.form.n2.value, this.form.x2bar.value, this.form.sd2.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                        1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+            ">
+        </td>
+        <td><span aria-hidden="true">$\bar{x}_2=$</span></td>
+        <td><input TYPE="TEXT" NAME="x2bar" SIZE="7" aria-label="Sample mean 2"
+            VALUE=""
+            ONCHANGE="
+                if(!xbarValid(this.form.x2bar.value) && this.form.x2bar.value !== '') {
+                    alert('Error: Choose a numeric x2bar value');
+                    this.form.x2bar.value = '';
+                }
+                if(allValid(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value, 
+                            this.form.n2.value, this.form.x2bar.value, this.form.sd2.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value, 
+                        1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+                ">
+        </td>
+        <td><select name="sd2dropdown" aria-label="Standard deviation type 2"
+            ONCHANGE="
+                if(this.form.sd2dropdown.value == 's2') {
+                    this.form.sd1dropdown.value = 's1';
+                    $('#sd1sd2dropdown').show(700);     
+                    $('#assume').show(700);     
+                }
+                else {
+                    this.form.sd1dropdown.value = 'sigma1';     
+                    $('#sd1sd2dropdown').hide(700);     
+                    $('#assume').hide(700);     
+                }
+                if(allValid(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value, 
+                            this.form.n2.value, this.form.x2bar.value, this.form.sd2.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                        1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+            ">
+            <option value="s2" selected="selected">s&#8322;=</option>
+            <option value="sigma2">&#963;&#8322;=</option>
+        </select></td>
+
+        <td><input TYPE="TEXT" NAME="sd2" SIZE="7" aria-label="Standard deviation 2"
+            VALUE=""
+            ONCHANGE="
+                if(!sdValid(this.form.sd2.value) && this.form.sd2.value !== '') {
+                    alert('Error: Choose sd2 > 0');
+                    this.form.sd2.value = '';
+                }
+                if(allValid(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value, 
+                            this.form.n2.value, this.form.x2bar.value, this.form.sd2.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                        1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+            ">
+        </td>
+    </tr>
+
+    <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td><div id='assume'>Assume:</div></td>
+    <td><div id='sd1sd2dropdown'>
+        <select name="sd1sd2dropdown" aria-label="Variance Assumption"
+            ONCHANGE="
+                if(this.form.sd2dropdown.value == 's2') {
+                    this.form.sd1dropdown.value = 's1';
+                }
+                else {
+                    this.form.sd1dropdown.value = 'sigma1';             
+                }
+                if(allValid(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value, 
+                            this.form.n2.value, this.form.x2bar.value, this.form.sd2.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                        1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+            ">
+            <option value="s1eqs2" selected="selected">&#963;&#8321; = &#963;&#8322;</option>
+            <option value="s1neqs2">&#963;&#8321; &#8800; &#963;&#8322;</option>
+        </select>
+    </div></td>
+    <td></td>
+    </tr>
+  </table>
+  
+<div id='ci' aria-live="polite">
+<p class="mathjaxCenter">
+<select name="conflevel" aria-label="Confidence Level"
+    ONCHANGE="                  
+            ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                this.form.sd1sd2dropdown.value);
+        ">
+    <option value="0.80">80%</option>
+    <option value="0.90">90%</option>
+    <option value="0.95" selected="selected">95%</option>
+    <option value="0.99">99%</option>
+    </select>
+    CI for $\mu_1 - \mu_2$: <span id="ci_output" class="mathjaxCI"></span></p>
+</div>
+
+<div id="test">
+    <p class="mathjaxCenter"><span aria-hidden="true">$H_0:\mu_1-\mu_2$</span>
+    <select name="H0select" aria-label="Null Hypothesis Operator"
+        ONCHANGE="
+            if(this.form.H0select.value == 'eq') {
+                this.form.Haselect.value = 'neq';
+            }
+            if(this.form.H0select.value == 'le') {
+                this.form.Haselect.value = 'gt';
+            }
+            if(this.form.H0select.value == 'ge') {
+                this.form.Haselect.value = 'lt';
+            }
+            ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                this.form.sd1sd2dropdown.value);
+        ">
+        <option value="eq" selected="selected">=</option>
+        <option value="ge">&#8805;</option>
+        <option value="le">&#8804;</option>
+        </select>
+    <input TYPE="TEXT" NAME="H0input" SIZE="7" PLACEHOLDER="&Delta;&#8320;" aria-label="Null Hypothesis Value"
+            VALUE=""
+            ONCHANGE="
+                this.form.Hainput.value = this.form.H0input.value;
+                if(h0haValid(this.form.H0input.value,this.form.Hainput.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                        1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+                else if (this.form.H0input.value !== '') {
+                    alert('Error: Enter a numeric value for H0')
+                    this.form.H0input.value = '';
+                    this.form.Hainput.value = '';
+                }
+    "><br>
+    <span aria-hidden="true">$H_a:\mu_1-\mu_2$</span>
+    <select name="Haselect" aria-label="Alternative Hypothesis Operator"
+        ONCHANGE="
+            if(this.form.Haselect.value == 'neq') {
+                this.form.H0select.value = 'eq';
+            }
+            if(this.form.Haselect.value == 'gt') {
+                this.form.H0select.value = 'le';
+            }
+            if(this.form.Haselect.value == 'lt') {
+                this.form.H0select.value = 'ge';
+            }
+            ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                this.form.sd1sd2dropdown.value);
+        ">
+        <option value="neq" selected="selected">&#8800;</option>
+        <option value="gt">&gt;</option>
+        <option value="lt">&lt;</option>
+        </select>
+    <input TYPE="TEXT" NAME="Hainput" SIZE="7" PLACEHOLDER="&Delta;&#8320;" aria-label="Alternative Hypothesis Value"
+            VALUE=""
+            ONCHANGE="
+                this.form.H0input.value = this.form.Hainput.value;
+                if(h0haValid(this.form.H0input.value,this.form.Hainput.value)) {
+                    ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                        1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                        this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                        this.form.sd1sd2dropdown.value);
+                }
+                else if(this.form.Hainput.value !== '') {
+                    alert('Error: Enter a numeric value for Ha');
+                    this.form.H0input.value = '';               
+                    this.form.Hainput.value = '';               
+                }
+        "></p>
+
+    <p class="mathjaxCenter">
+    <label for="signiflevelSelect">Significance level: $\alpha =$</label>
+    <select id="signiflevelSelect" name="signiflevel" aria-label="Significance level"
+        ONCHANGE="                  
+            ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                this.form.sd1sd2dropdown.value);
+            ">
+        <option value="0.20">0.20</option>
+        <option value="0.10">0.10</option>
+        <option value="0.05" selected="selected">0.05</option>
+        <option value="0.01">0.01</option>
+    </select>
+    </p>
+</div>
+
+<div id="testoutput" aria-live="polite">
+    <p id='criticalValue' class='mathjaxCenter'></p>
+    <p id='test_stat' class='mathjaxCenter'></p>
+    <p id='p_value' class='mathjaxCenter'></p>
+    <br>
+    <div id='pdfPlot' aria-label="Probability density function plot" role="figure"></div>
+</div>
+
+<br>
+
+<div style="display: flex; margin-bottom: 5px; justify-content: space-between; align-items: center; margin-top: 15px; padding: 0 5px;">
+    <p class='small' style="margin: 0;">
+        <label>Show equations
+        <input id="showeq" type="checkbox" value="showeqvalue" style="width: auto; margin-right: 5px; vertical-align: middle;" aria-label="Show equations" onchange="
+            ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                this.form.sd1sd2dropdown.value);
+        "></label>
+    </p>
+
+    <div>
+        <input id="refreshbutton" type="button" value="Refresh" aria-label="Refresh calculations" style="width: auto; cursor: pointer; padding: 2px 10px; margin-right: 0;" onclick="
+            if(allValid(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value, 
+                        this.form.n2.value, this.form.x2bar.value, this.form.sd2.value)) {
+                ztInference(this.form.n1.value, this.form.x1bar.value, this.form.sd1.value,
+                    this.form.n2.value, this.form.x2bar.value, this.form.sd2.value,  
+                    1-this.form.conflevel.value, this.form.sd2dropdown.value, 
+                    this.form.H0input.value, this.form.Haselect.value, this.form.signiflevel.value, 
+                    this.form.sd1sd2dropdown.value);
+            }
+        ">
+    </div>
+</div>
+
+
+</form>
+</div>
+
+</main>
+    
+<footer>
+<div id="footerleft">
+<div id="flip1"><button aria-expanded="false" aria-controls="panel1" style="cursor: pointer;">Help</button></div>
+</div>
+<div id="footerright">
+<p class='small'>
+&copy;2026 Matt Bognar, PhD<br>
+</p>
+</div>
+</footer>
+
+<div id="panel1" role="region" aria-label="Help Information">
+<p>
+This applet computes performs inference for a population mean $\mu$.
+</p>
+
+<h4>Assume </h4>
+<ol>
+<li>$X_{1i} \stackrel{iid}{\sim} N(\mu_1,\sigma_1^2)$ for $i=1,\ldots,n_1$</li>
+<li>$X_{2i} \stackrel{iid}{\sim} N(\mu_2,\sigma_2^2)$ for $i=1,\ldots,n_2$</li>
+<li>Samples are independent</li>
+</ol>
+
+<h4>Directions</h4>
+<ul>
+<li>For the first sample, enter the sample size in the $n_1$ box, enter the sample mean in the $\bar{x}_1$ box, and enter either the population standard deviation $\sigma_1$ or the sample standard deviation $s_1$ in the standard deviation box.</li>
+<li>Enter the summary statistics for the second sample.</li>
+<li>For a two-sample t-test (i.e. when entering $s_1$ and $s_2$), choose if you are assuming $\sigma_1 = \sigma_2$ or $\sigma_1 \neq \sigma_2$ from the drop-down box.
+<li>Hitting "Tab" or "Enter" on your keyboard will compute a 95% confidence interval for $\mu_1-\mu_2$ (you can change the confidence level using the drop-down box).</li>
+</ul>
+
+<p>To perform a hypothesis test for $\mu_1-\mu_2$, enter $H_0$ and $H_a$. Specify the null and alternative hypotheses with the drop-down boxes. The critical value, rejection region, test statistic, and $p-$value are computed and graphed. Different significance levels can be chosen with the drop-down box.
+</p>
+</div>
+
+</body>
+</html>
+
