@@ -256,3 +256,161 @@ input.tight-checkbox {
     vertical-align: middle; /* Ensures text and checkbox line up vertically */
 }
 
+/* Gemini Help Camera & Step-by-Step Resolution Panel */
+#flip1 {
+	cursor: pointer;
+	width: auto;
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 3px;
+}
+
+#help-solved-list {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 3px;
+}
+
+.help-solved-btn {
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	border: solid 1px rgb(180,180,180);
+	color: rgb(60,60,60);
+	background-color: rgb(210,210,210);
+	padding: 1px 7px;
+	cursor: pointer;
+	font-size: 90%;
+}
+
+.help-solved-btn:hover {
+	background-color: rgb(195,195,195);
+}
+
+.help-solved-btn.active {
+	background-color: rgb(175,175,175);
+	border-color: rgb(120,120,120);
+	color: rgb(20,20,20);
+	font-weight: bold;
+}
+
+#gemini-resolution-panel {
+	display: none;
+	margin-top: 10px;
+	padding: 10px 14px;
+	border: solid 1px rgb(200,200,200);
+	border-radius: 3px;
+	background-color: rgb(230,230,230);
+	box-shadow: 0px 0px 6px rgba(0,0,0,0.15);
+	text-align: left;
+	font-family: Arial, Helvetica, sans-serif;
+	color: black;
+}
+
+.gemini-panel-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px solid rgb(200,200,200);
+	padding-bottom: 6px;
+	margin-bottom: 8px;
+}
+
+.gemini-panel-meta {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+}
+
+.gemini-panel-title {
+	font-size: 95%;
+	color: rgb(40,40,40);
+}
+
+.gemini-panel-time {
+	font-size: 75%;
+	color: rgb(110,110,110);
+}
+
+.gemini-panel-close {
+	padding: 0px 7px;
+	line-height: 1.3;
+	font-size: 14px;
+}
+
+.gemini-panel-body {
+	font-size: 92%;
+	line-height: 1.5;
+	overflow-x: auto;
+}
+
+.gemini-panel-body p {
+	margin: 6px 0;
+}
+
+.gemini-panel-body h2,
+.gemini-panel-body h3,
+.gemini-panel-body h4 {
+	margin: 10px 0 4px 0;
+	color: rgb(35,35,35);
+}
+
+.gemini-panel-body ul,
+.gemini-panel-body ol {
+	margin: 6px 0 6px 18px;
+	padding-left: 8px;
+}
+
+.gemini-panel-body pre {
+	background-color: rgb(245,245,245);
+	border: 1px solid rgb(200,200,200);
+	border-radius: 3px;
+	padding: 8px;
+	overflow-x: auto;
+	font-size: 88%;
+}
+
+.gemini-panel-body code {
+	background-color: rgb(242,242,242);
+	padding: 1px 4px;
+	border-radius: 3px;
+	font-family: monospace;
+}
+
+.gemini-math-display {
+	margin: 6px 0;
+	overflow-x: auto;
+}
+
+.gemini-loading {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: rgb(60,60,60);
+	padding: 6px 0;
+}
+
+.gemini-spinner {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	border: 2px solid rgb(180,180,180);
+	border-top-color: rgb(70,70,70);
+	border-radius: 50%;
+	animation: gemini-spin 0.8s linear infinite;
+}
+
+@keyframes gemini-spin {
+	to { transform: rotate(360deg); }
+}
+
+.gemini-error {
+	color: rgb(140,30,30);
+}
+
+.gemini-retry-btn {
+	margin-top: 4px;
+}
+
