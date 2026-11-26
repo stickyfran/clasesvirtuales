@@ -416,6 +416,52 @@
     }
   }
 
+  function isRefusalReply(text) {
+    if (!text) return false;
+    var trimmed = String(text).trim();
+    if (trimmed.length > 260) return false;
+    return /solo soy (un modelo de lenguaje|una ia)|no puedo ayudarte con eso/i.test(trimmed);
+  }
+
+  async function sendImageQuery(prompt, base64Data) {
+    var response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        query: prompt,
+        files: [
+          {
+            name: "ejercicio.jpg",
+            mimeType: "image/jpeg",
+            data: base64Data
+          }
+        ],
+        temporary: false,
+        model: MODEL_ID,
+        thinking_mode: THINKING_MODE
+      })
+    });
+
+    var rawText = await response.text();
+    var data = null;
+    try {
+      data = JSON.parse(rawText);
+    } catch (_parseErr) {
+      data = null;
+    }
+
+    if (!response.ok || !data || !data.ok || !data.reply) {
+      var errMsg =
+        (data && data.error) ||
+        "El servidor respondió con estado HTTP " + response.status + ".";
+      throw new Error(errMsg);
+    }
+
+    return data.reply;
+  }
+
   async function processImageFile(file) {
     if (!file) return;
     lastFile = file;
@@ -427,45 +473,17 @@
       var base64Data = await resizeImageToBase64(file, 1280, 0.82);
       var contextTitle = document.title || "Estadística";
       var prompt =
-        "Leé atentamente la foto del examen o ejercicio de probabilidad y estadística y resolvelo paso a paso directamente, sin pedir confirmaciones. Si hay varios ejercicios visibles, resolvé todos los que se lean completos. Para cada ejercicio, definí la variable aleatoria, la distribución o estadístico utilizado, los parámetros/datos y cada paso del cálculo en LaTeX ($...$ y $$...$$). Al final, agregá una sección **Respuesta:** con una oración completa en español que responda directamente a la pregunta del enunciado en palabras y contexto (no solo el valor numérico o la aritmética).";
+        "Transcribí los enunciados de esta guía de ejercicios de probabilidad y estadística y explicá paso a paso cómo resolver cada uno con fines de estudio. Definí la variable aleatoria, la distribución o estadístico, los parámetros/datos y cada paso del cálculo en LaTeX ($...$ y $$...$$). Al final de cada ejercicio, agregá una sección **Respuesta:** con una oración completa en español que responda directamente a la pregunta en palabras y contexto (no solo el valor numérico o la aritmética).";
 
-      var response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          query: prompt,
-          files: [
-            {
-              name: "ejercicio.jpg",
-              mimeType: "image/jpeg",
-              data: base64Data
-            }
-          ],
-          temporary: false,
-          model: MODEL_ID,
-          thinking_mode: THINKING_MODE
-        })
-      });
-
-      var rawText = await response.text();
-      var data = null;
-      try {
-        data = JSON.parse(rawText);
-      } catch (_parseErr) {
-        data = null;
-      }
-
-      if (!response.ok || !data || !data.ok || !data.reply) {
-        var errMsg =
-          (data && data.error) ||
-          "El servidor respondió con estado HTTP " + response.status + ".";
-        throw new Error(errMsg);
+      var reply = await sendImageQuery(prompt, base64Data);
+      if (isRefusalReply(reply)) {
+        var fallbackPrompt =
+          "Transcribí el texto matemático que aparece en esta imagen y desarrollá los cálculos paso a paso en LaTeX ($...$ y $$...$$). Al final, incluí una sección **Respuesta:** con una oración completa en español.";
+        reply = await sendImageQuery(fallbackPrompt, base64Data);
       }
 
       resolutions.push({
-        reply: data.reply,
+        reply: reply,
         timeLabel: formatTimeLabel(new Date()),
         title: contextTitle
       });
