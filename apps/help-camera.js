@@ -347,7 +347,7 @@
     activeIndex = -1;
     isTextHidden = false;
     var baseStart = startMs || Date.now();
-    panelBodyEl.style.opacity = "0.85";
+    panelBodyEl.style.opacity = TEXT_OPACITY;
     function loadingMessage(secs) {
       if (secs > 60) {
         return "Reintentando conexión por demora de red... (" + secs + "s)";
