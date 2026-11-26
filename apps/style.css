@@ -257,13 +257,9 @@ input.tight-checkbox {
 }
 
 /* Gemini Help Camera & Step-by-Step Resolution Panel */
-#flip1 {
+#gemini-camera-trigger {
 	cursor: pointer;
-	width: auto;
-	display: inline-flex;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: 3px;
+	user-select: none;
 }
 
 #help-solved-list {
@@ -271,6 +267,7 @@ input.tight-checkbox {
 	align-items: center;
 	flex-wrap: wrap;
 	gap: 3px;
+	margin-left: 5px;
 }
 
 .help-solved-btn {

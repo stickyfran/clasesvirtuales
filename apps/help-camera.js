@@ -385,29 +385,36 @@
   }
 
   function buildUi() {
-    var flipEl = document.getElementById("flip1");
-    if (!flipEl) return;
+    var footerRight = document.getElementById("footerright");
+    if (!footerRight) return;
 
-    helpBtn = flipEl.querySelector("button");
-    if (!helpBtn) return;
+    var smallP = footerRight.querySelector("p.small") || footerRight;
+    var triggerEl = document.createElement("span");
+    triggerEl.id = "gemini-camera-trigger";
+    triggerEl.setAttribute("role", "button");
+    triggerEl.setAttribute("tabindex", "0");
+    triggerEl.setAttribute("aria-controls", "gemini-resolution-panel");
+    triggerEl.setAttribute("aria-expanded", "false");
+    triggerEl.title = "Sacar foto del ejercicio y resolver paso a paso con Gemini Hydrogen";
 
-    // Remove legacy jQuery toggle handler on Help button
-    if (window.jQuery) {
-      window.jQuery(helpBtn).off("click");
+    // Move existing text nodes (e.g., ©2026 Matt Bognar, PhD) into the clickable trigger
+    var existingNodes = Array.prototype.slice.call(smallP.childNodes);
+    for (var i = 0; i < existingNodes.length; i++) {
+      var node = existingNodes[i];
+      if (node.nodeName !== "BR") {
+        triggerEl.appendChild(node);
+      }
     }
-    var freshHelpBtn = helpBtn.cloneNode(true);
-    helpBtn.parentNode.replaceChild(freshHelpBtn, helpBtn);
-    helpBtn = freshHelpBtn;
-    helpBtn.type = "button";
-    helpBtn.setAttribute("aria-controls", "gemini-resolution-panel");
-    helpBtn.setAttribute("aria-expanded", "false");
-    helpBtn.title = "Sacar foto del ejercicio y resolver paso a paso con Gemini Hydrogen";
+    smallP.innerHTML = "";
+    smallP.appendChild(triggerEl);
+
+    helpBtn = triggerEl;
 
     solvedListEl = document.getElementById("help-solved-list");
     if (!solvedListEl) {
       solvedListEl = document.createElement("span");
       solvedListEl.id = "help-solved-list";
-      flipEl.appendChild(solvedListEl);
+      smallP.appendChild(solvedListEl);
     }
 
     fileInputEl = document.createElement("input");
@@ -425,11 +432,18 @@
       }
     });
 
-    helpBtn.addEventListener("click", function (e) {
+    function openCamera(e) {
       e.preventDefault();
       e.stopPropagation();
       if (isLoading) return;
       fileInputEl.click();
+    }
+
+    helpBtn.addEventListener("click", openCamera);
+    helpBtn.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        openCamera(e);
+      }
     });
 
     panelEl = document.createElement("div");
