@@ -10673,6 +10673,32 @@
                 </div>
 
             </div>
+        
+            <!-- DISTRIBUCIÓN GAMMA EN CAPÍTULO 4 -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-sky-200 mt-6">
+                <div class="flex items-center gap-3 mb-4 flex-wrap">
+                    <span class="px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-bold tracking-wide uppercase">Cap. 4 • Complemento de Parcial</span>
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Distribución Gamma ($\text{Gamma}(\alpha;\,\beta)$): Suma y Escalamiento</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-700 leading-relaxed">
+                    <div class="space-y-2.5">
+                        <p><strong>¿Qué es y para qué sirve?</strong> La distribución $\text{Gamma}(\alpha;\,\beta)$ modela variables continuas positivas (tiempos de espera totales hasta $\alpha$ eventos, montos o duraciones), generalizando a la Exponencial ($\alpha=1$).</p>
+                        <ul class="list-disc list-inside bg-slate-50 p-3.5 rounded-xl border border-slate-100 space-y-1.5 text-xs">
+                            <li><strong>Parámetros:</strong> $\alpha &gt; 0$ (forma) y $\beta &gt; 0$ (escala).</li>
+                            <li><strong>Momentos:</strong> $E(X) = \alpha\beta$ &nbsp;|&nbsp; $Var(X) = \alpha\beta^2$.</li>
+                            <li><strong>Uso en parciales:</strong> deducir la distribución muestral exacta de $\sum X_i$, $\bar{X}$ o estimadores como $\bar{X}/\alpha$.</li>
+                        </ul>
+                    </div>
+                    <div class="math-box p-4 rounded-xl text-xs space-y-2" style="border-left-color:#0284c7;">
+                        <p class="text-sm font-bold text-slate-900">Las 2 propiedades clave (con $X_i \sim \text{Gamma}(\alpha;\,\beta)$ indep.):</p>
+                        <p><strong>1. Reproductiva (suma):</strong> $$\sum_{i=1}^n X_i \sim \text{Gamma}(n\alpha;\; \beta)$$ (se multiplica la <strong>forma</strong> por $n$; $\beta$ no cambia).</p>
+                        <p><strong>2. Escala (constante $c &gt; 0$):</strong> $$c \cdot Y \sim \text{Gamma}(\alpha_Y;\; c\beta_Y)$$ (la <strong>escala</strong> se multiplica por $c$; la forma no cambia).</p>
+                        <p class="bg-white/95 border border-sky-100 rounded-lg p-2 text-slate-700">
+                            <strong>Mini-ejemplo:</strong> Si $\hat{\beta} = \frac{\bar{X}}{3} = \frac{1}{3n}\sum_{i=1}^n X_i$, primero $\sum X_i \sim \text{Gamma}(n\alpha;\,\beta)$ y luego con $c=\frac{1}{3n}$ queda $\hat{\beta} \sim \text{Gamma}\!\left(n\alpha;\; \frac{\beta}{3n}\right)$.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- ==================== CAPÍTULO 5 (TEMA 8): INFERENCIA Y ESTIMACIÓN PUNTUAL ==================== -->
@@ -16355,7 +16381,7 @@
                             <p class="font-semibold text-amber-700">Resolución Paso a Paso:</p>
                             <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs text-slate-700 leading-relaxed">
                                 <p class="font-bold text-amber-900 mb-1"><i class="fa-solid fa-brain mr-1"></i> Razonamiento y lógica de la resolución:</p>
-                                <p>1) <strong>Suma de Gammas:</strong> cuando sumás $n$ variables independientes $\text{Gamma}(\alpha;\,\beta)$ con igual escala $\beta$, el parámetro de forma se multiplica por $n$ ($\alpha \to n\alpha$) y $\beta$ queda igual. 2) <strong>Escalamiento:</strong> al multiplicar la suma por una constante positiva $c$ (por ejemplo $1/n$), el parámetro de forma no cambia y la escala se multiplica por $c$ ($\beta \to c\beta$).</p>
+                                <p>1) <strong>¿Por qué Gamma y qué es cada parámetro?:</strong> $\text{Gamma}(\alpha;\,\beta)$ modela tiempos/montos positivos donde $\alpha$ es la <em>forma</em> y $\beta$ la <em>escala</em> ($E(X)=\alpha\beta$, $Var(X)=\alpha\beta^2$). 2) <strong>Suma de Gammas independientes:</strong> al sumar $n$ variables $\text{Gamma}(\alpha;\,\beta)$ con igual $\beta$, las formas se suman ($\alpha \to n\alpha$) y la escala $\beta$ queda intacta. 3) <strong>Escalamiento por constante $c &gt; 0$:</strong> al multiplicar la suma por $c$ (por ej. $1/n$ para $\bar{X}$), la forma $n\alpha$ NO cambia y la escala se multiplica por $c$ ($\beta \to c\beta$).</p>
                             </div>
                             <ol class="space-y-2.5 text-slate-700">
                                 <li class="flex items-start gap-2.5 bg-slate-50/80 border border-slate-200/80 rounded-lg p-3">
@@ -17045,7 +17071,7 @@
                             <p class="font-semibold text-rose-700">Resolución Paso a Paso:</p>
                             <div class="mb-3 rounded-xl border border-rose-200 bg-rose-50/70 p-3 text-xs text-slate-700 leading-relaxed">
                                 <p class="font-bold text-rose-900 mb-1"><i class="fa-solid fa-brain mr-1"></i> Razonamiento y lógica de la resolución:</p>
-                                <p>1) <strong>Identificar $\hat{\beta}$:</strong> como $\bar{X}/3 = \frac{1}{3n}\sum_{i=1}^n X_i$, primero aplicás la propiedad reproductiva de la suma ($\sum X_i \sim \text{Gamma}(n\alpha;\,\beta)$). 2) <strong>Aplicar la constante $c = \frac{1}{3n}$:</strong> la forma $n\alpha$ se mantiene intacta y la escala pasa a $\beta' = \frac{\beta}{3n}$.</p>
+                                <p>1) <strong>Reescribir $\hat{\beta} = \bar{X}/3$ como suma escalada:</strong> $\bar{X}/3 = \frac{1}{3n}\sum_{i=1}^n X_i$. 2) <strong>Propiedad reproductiva:</strong> como los $X_i \sim \text{Gamma}(\alpha;\,\beta)$ son independientes con igual escala $\beta$, la suma $\sum_{i=1}^n X_i$ sigue $\text{Gamma}(n\alpha;\,\beta)$. 3) <strong>Propiedad de escala ($c = \frac{1}{3n}$):</strong> multiplicar una Gamma por $c &gt; 0$ deja fija la forma ($n\alpha$) y multiplica la escala por $c$: $\hat{\beta} \sim \text{Gamma}\!\left(n\alpha;\; \frac{\beta}{3n}\right)$.</p>
                             </div>
                             <ol class="space-y-2.5 text-slate-700">
                                 <li class="flex items-start gap-2.5 bg-slate-50/80 border border-slate-200/80 rounded-lg p-3">
@@ -21902,6 +21928,7 @@
                 <p>• <strong>Tukey:</strong> $LI = Q_1 - 1{,}5\cdot IQR$, $LS = Q_3 + 1{,}5\cdot IQR$ &nbsp;|&nbsp; <strong>CV:</strong> $CV = \frac{S}{|\bar{x}|}\cdot 100\%$.</p>
                 <p>• <strong>Pearson:</strong> $r = \frac{S_{xy}}{S_x S_y} \in [-1;1]$ &nbsp;|&nbsp; <strong>Índices:</strong> $I_L = \frac{\sum p_1 q_0}{\sum p_0 q_0}\cdot 100$, $I_P = \frac{\sum p_1 q_1}{\sum p_0 q_1}\cdot 100$, $I_F = \sqrt{I_L I_P}$.</p>
                 <p>• <strong>Deflactación y Rebase:</strong> $I_t^{\text{nuevo}} = \frac{I_t^{\text{viejo}}}{I_{\text{base}}^{\text{viejo}}}\cdot 100$ &nbsp;|&nbsp; $\text{Real}_t = \frac{\text{Nominal}_t}{\text{IPC}_t}\cdot 100$.</p>
+                <p>• <strong>Gamma($\alpha;\,\beta$):</strong> $E=\alpha\beta$, $Var=\alpha\beta^2$ &nbsp;|&nbsp; $\sum_{i=1}^n X_i \sim \text{Gamma}(n\alpha;\,\beta)$ &nbsp;|&nbsp; $cY \sim \text{Gamma}(\alpha_Y;\, c\beta_Y)$.</p>
             </div>
             <div class="formula-cat-card rounded-xl border border-rose-200 bg-rose-50/60 p-3 space-y-1" data-cat="cap5">
                 <p class="font-bold text-rose-900">Cap. 5 — LGN y Estimación Puntual</p>
