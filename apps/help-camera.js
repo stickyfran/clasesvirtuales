@@ -272,7 +272,7 @@
   function showLoading() {
     isLoading = true;
     activeIndex = -1;
-    panelTitleEl.textContent = "Resolviendo con Gemini Hydrogen...";
+    panelTitleEl.textContent = "";
     panelTimeEl.textContent = "";
     panelBodyEl.innerHTML =
       '<div class="gemini-loading">' +
@@ -284,11 +284,11 @@
 
   function showError(message) {
     isLoading = false;
-    panelTitleEl.textContent = "Error al resolver";
+    panelTitleEl.textContent = "";
     panelTimeEl.textContent = "";
     panelBodyEl.innerHTML =
       '<div class="gemini-error">' +
-      "<p>" + escapeHtml(message) + "</p>" +
+      "<p><strong>Error:</strong> " + escapeHtml(message) + "</p>" +
       (lastFile
         ? '<button type="button" class="gemini-retry-btn">Reintentar</button>'
         : "") +
@@ -310,7 +310,7 @@
     activeIndex = idx;
     var item = resolutions[idx];
     panelTitleEl.textContent = "Resolución (" + (idx + 1) + ")";
-    panelTimeEl.textContent = item.timeLabel || "";
+    panelTimeEl.textContent = item.timeLabel ? " (" + item.timeLabel + ")" : "";
     panelBodyEl.innerHTML = markdownToHtml(item.reply);
     openPanel();
     typesetMath(panelBodyEl);
@@ -335,7 +335,7 @@
       var prompt =
         "Resolvé paso a paso el ejercicio de la imagen (contexto: " +
         contextTitle +
-        "). Explicá claramente cada paso, las fórmulas utilizadas en LaTeX ($...$ y $$...$$) y el resultado final.";
+        "). Escribí la explicación con formato claro usando títulos cortos (####), párrafos y listas simples (como una guía de ayuda académica), definiendo la variable aleatoria, la distribución, los parámetros y cada paso del cálculo en LaTeX ($...$ y $$...$$). Al final, incluí una sección **Respuesta:** con una oración completa en español que responda directamente a la pregunta del problema en palabras y contexto (no solo el valor numérico o la aritmética).";
 
       var response = await fetch(API_URL, {
         method: "POST",
