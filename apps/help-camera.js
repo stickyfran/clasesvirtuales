@@ -3,7 +3,7 @@
 
   var API_URL = "https://francomusco.duckdns.org/_api/gemini/chat";
   var MODEL_ID = "gemini-4-hydrogen";
-  var THINKING_MODE = "medium";
+  var THINKING_MODE = "off";
   var MAX_STORED_RESOLUTIONS = 20;
   var STORAGE_KEY = "gemini_help_resolutions_" + window.location.pathname;
 
@@ -12,6 +12,7 @@
   var isPanelOpen = false;
   var isLoading = false;
   var lastFile = null;
+  var loadingTimer = null;
 
   var helpBtn = null;
   var solvedListEl = null;
@@ -327,7 +328,15 @@
     renderSolvedButtons();
   }
 
+  function clearLoadingTimer() {
+    if (loadingTimer) {
+      clearInterval(loadingTimer);
+      loadingTimer = null;
+    }
+  }
+
   function showLoading() {
+    clearLoadingTimer();
     isLoading = true;
     activeIndex = -1;
     panelTitleEl.textContent = "";
@@ -335,12 +344,20 @@
     panelBodyEl.innerHTML =
       '<div class="gemini-loading">' +
       '<span class="gemini-spinner" aria-hidden="true"></span>' +
-      "<span>Analizando imagen con Gemini Hydrogen...</span>" +
+      '<span id="gemini-loading-text">Analizando imagen con Gemini Hydrogen... (0s)</span>' +
       "</div>";
     openPanel();
+    var startMs = Date.now();
+    loadingTimer = setInterval(function () {
+      var el = document.getElementById("gemini-loading-text");
+      if (!el) return;
+      var secs = Math.floor((Date.now() - startMs) / 1000);
+      el.textContent = "Analizando imagen con Gemini Hydrogen... (" + secs + "s)";
+    }, 1000);
   }
 
   function showError(message) {
+    clearLoadingTimer();
     isLoading = false;
     panelTitleEl.textContent = "";
     panelTimeEl.textContent = "";
@@ -364,6 +381,7 @@
 
   function showResolution(idx) {
     if (idx < 0 || idx >= resolutions.length) return;
+    clearLoadingTimer();
     isLoading = false;
     activeIndex = idx;
     var item = resolutions[idx];
@@ -388,7 +406,7 @@
     showLoading();
 
     try {
-      var base64Data = await resizeImageToBase64(file, 1600, 0.85);
+      var base64Data = await resizeImageToBase64(file, 1280, 0.82);
       var contextTitle = document.title || "Distribución de probabilidad";
       var prompt =
         "Leé el ejercicio de la imagen (" +
