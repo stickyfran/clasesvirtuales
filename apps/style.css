@@ -323,8 +323,17 @@ input.tight-checkbox {
 
 .gemini-panel-body {
 	font-size: 100%;
+	max-height: 45vh;
+	overflow-y: auto;
 	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
 	opacity: 0.1;
+}
+
+.gemini-panel-body::-webkit-scrollbar {
+	display: none;
 }
 
 .gemini-panel-body p {
