@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apps de Distribuciones de Probabilidad — StickyFran</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .dist-btn.active { background-color: #0f172a; color: #ffffff; border-color: #0f172a; }
+        input[type="number"]::-webkit-inner-spin-button { opacity: 0.6; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow">
+                    <i class="fa-solid fa-chart-area text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg leading-tight">Probability Distribution Apps</h1>
+                    <p class="text-[11px] text-slate-400">Calculadoras interactivas estilo Bognar • Continuas &amp; Discretas</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+                <a href="../ProbabilidadyEstadisticaUBA-UTN.html" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold transition inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-open"></i> Guía UBA-UTN
+                </a>
+                <a href="../" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-house"></i> Inicio
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="max-w-7xl w-full mx-auto px-4 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- SIDEBAR: SELECTOR DE DISTRIBUCIONES -->
+        <aside class="lg:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 space-y-4">
+            <div>
+                <h2 class="text-xs font-extrabold uppercase tracking-wider text-indigo-700 mb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-wave-square"></i> Continuas
+                </h2>
+                <div id="contList" class="grid grid-cols-2 lg:grid-cols-1 gap-1.5"></div>
+            </div>
+            <div class="pt-3 border-t border-slate-100">
+                <h2 class="text-xs font-extrabold uppercase tracking-wider text-emerald-700 mb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-chart-column"></i> Discretas
+                </h2>
+                <div id="discList" class="grid grid-cols-2 lg:grid-cols-1 gap-1.5"></div>
+            </div>
+        </aside>
+
+        <!-- CALCULADORA PRINCIPAL -->
+        <section class="lg:col-span-9 space-y-5">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-5">
+                <!-- Título y resumen -->
+                <div class="flex items-start justify-between flex-wrap gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                        <span id="distTypeBadge" class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide bg-indigo-100 text-indigo-800 mb-1">Continua</span>
+                        <h2 id="distTitle" class="text-2xl font-extrabold text-slate-900">Distribución Normal</h2>
+                        <p id="distNotation" class="text-xs text-slate-500 mt-0.5 font-mono">X ~ N(μ, σ²)</p>
+                    </div>
+                    <div id="momentsBox" class="flex flex-wrap gap-2 text-xs"></div>
+                </div>
+
+                <!-- Controles de parámetros y cálculo -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+                    <!-- Parámetros dinámicos -->
+                    <div id="paramsContainer" class="md:col-span-5 grid grid-cols-2 gap-3"></div>
+
+                    <!-- Modo de probabilidad -->
+                    <div class="md:col-span-3">
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Región / Probabilidad</label>
+                        <select id="probMode" onchange="onModeChange()" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="le">P(X ≤ x)</option>
+                            <option value="ge">P(X ≥ x)</option>
+                            <option value="eq">P(X = x)</option>
+                            <option value="between">P(a ≤ X ≤ b)</option>
+                            <option value="outside">P(X ≤ a ó X ≥ b)</option>
+                        </select>
+                    </div>
+
+                    <!-- Valor x (o a, b) -->
+                    <div id="xInputsContainer" class="md:col-span-4 grid grid-cols-2 gap-2"></div>
+                </div>
+
+                <!-- Barra de resultado + cálculo inverso (cuantil) -->
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center bg-indigo-50/70 border border-indigo-200 rounded-xl p-4">
+                    <div class="sm:col-span-5">
+                        <label id="probResultLabel" class="block text-[11px] font-bold text-indigo-900 uppercase tracking-wide mb-1">Probabilidad P(X ≤ x)</label>
+                        <div class="flex items-center gap-2">
+                            <input id="probOutput" type="number" step="0.0001" min="0" max="1"
+                                class="w-full px-3 py-2 rounded-lg border-2 border-indigo-300 bg-white text-base font-extrabold text-indigo-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                onchange="solveInverseFromProb()" onkeydown="if(event.key==='Enter') solveInverseFromProb()">
+                            <button onclick="solveInverseFromProb()" type="button" title="Calcular x (cuantil) a partir de esta probabilidad"
+                                class="shrink-0 px-3 py-2 rounded-lg bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold transition cursor-pointer">
+                                Hallar x
+                            </button>
+                        </div>
+                        <p class="text-[11px] text-indigo-700 mt-1">Podés editar la probabilidad y tocar <strong>Hallar x</strong> para sacar el cuantil inverso.</p>
+                    </div>
+                    <div class="sm:col-span-7 flex flex-wrap items-center justify-end gap-2">
+                        <button onclick="computeAndDraw()" type="button" class="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer inline-flex items-center gap-1.5">
+                            <i class="fa-solid fa-calculator"></i> Calcular
+                        </button>
+                        <button onclick="setQuickProb(0.95)" type="button" class="px-2.5 py-2 rounded-lg bg-white hover:bg-indigo-100 border border-indigo-200 text-indigo-800 text-xs font-semibold transition cursor-pointer">p = 0,95</button>
+                        <button onclick="setQuickProb(0.975)" type="button" class="px-2.5 py-2 rounded-lg bg-white hover:bg-indigo-100 border border-indigo-200 text-indigo-800 text-xs font-semibold transition cursor-pointer">p = 0,975</button>
+                        <button onclick="setQuickProb(0.99)" type="button" class="px-2.5 py-2 rounded-lg bg-white hover:bg-indigo-100 border border-indigo-200 text-indigo-800 text-xs font-semibold transition cursor-pointer">p = 0,99</button>
+                        <button onclick="setQuickProb(0.05)" type="button" class="px-2.5 py-2 rounded-lg bg-white hover:bg-indigo-100 border border-indigo-200 text-indigo-800 text-xs font-semibold transition cursor-pointer">p = 0,05</button>
+                    </div>
+                </div>
+
+                <!-- Gráfico Canvas HiDPI -->
+                <div class="bg-white rounded-xl border border-slate-200 p-3">
+                    <canvas id="distCanvas" class="w-full h-72 sm:h-80 block"></canvas>
+                </div>
+
+                <!-- Nota / Error -->
+                <div id="statusMsg" class="hidden text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center text-xs text-slate-400 py-4 border-t border-slate-200 bg-white">
+        StickyFran • Calculadoras de Distribuciones de Probabilidad (inspirado en Matt Bognar — University of Iowa)
+    </footer>
+
+<script>
+// ==================== FUNCIONES ESPECIALES DE ALTA PRECISIÓN ====================
+function logGamma(z) {
+    const g = 7;
+    const p = [
+        0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+        771.32342877765313, -176.61502916214059, 12.507343278686905,
+        -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7
+    ];
+    if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - logGamma(1 - z);
+    z -= 1;
+    let x = p[0];
+    for (let i = 1; i < g + 2; i++) x += p[i] / (z + i);
+    const t = z + g + 0.5;
+    return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+}
+
+function logComb(n, k) {
+    if (k < 0 || k > n) return -Infinity;
+    return logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1);
+}
+
+function erf(x) {
+    const sign = x < 0 ? -1 : 1;
+    x = Math.abs(x);
+    const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+    const t = 1 / (1 + p * x);
+    const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+    return sign * y;
+}
+
+function normalCDF(x) { return 0.5 * (1 + erf(x / Math.SQRT2)); }
+function normalPDF(x) { return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI); }
+
+function normalInv(p) {
+    if (p <= 0) return -Infinity;
+    if (p >= 1) return Infinity;
+    const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+    const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+    const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+    const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+    const plow = 0.02425, phigh = 1 - plow;
+    let q, r;
+    if (p < plow) {
+        q = Math.sqrt(-2 * Math.log(p));
+        return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+    }
+    if (p <= phigh) {
+        q = p - 0.5; r = q * q;
+        return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+    }
+    q = Math.sqrt(-2 * Math.log(1 - p));
+    return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+}
+
+// Regularized lower incomplete gamma P(a, x)
+function regGammaP(a, x) {
+    if (x <= 0) return 0;
+    if (x < a + 1) {
+        let sum = 1 / a, term = 1 / a;
+        for (let n = 1; n < 400; n++) {
+            term *= x / (a + n);
+            sum += term;
+            if (Math.abs(term) < Math.abs(sum) * 1e-13) break;
+        }
+        return sum * Math.exp(-x + a * Math.log(x) - logGamma(a));
+    }
+    // Lentz continued fraction for Q(a, x)
+    let b = x + 1 - a, c = 1 / 1e-30, d = 1 / b, h = d;
+    for (let i = 1; i < 400; i++) {
+        const an = -i * (i - a);
+        b += 2;
+        d = an * d + b; if (Math.abs(d) < 1e-30) d = 1e-30;
+        c = b + an / c; if (Math.abs(c) < 1e-30) c = 1e-30;
+        d = 1 / d;
+        const del = d * c;
+        h *= del;
+        if (Math.abs(del - 1) < 1e-13) break;
+    }
+    return 1 - Math.exp(-x + a * Math.log(x) - logGamma(a)) * h;
+}
+
+// Regularized incomplete beta I_x(a, b)
+function betacf(a, b, x) {
+    const MAXIT = 400, EPS = 3e-12, FPMIN = 1e-30;
+    let qab = a + b, qap = a + 1, qam = a - 1;
+    let c = 1, d = 1 - qab * x / qap;
+    if (Math.abs(d) < FPMIN) d = FPMIN;
+    d = 1 / d;
+    let h = d;
+    for (let m = 1; m <= MAXIT; m++) {
+        const m2 = 2 * m;
+        let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+        d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+        c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+        d = 1 / d; h *= d * c;
+        aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+        d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+        c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+        d = 1 / d;
+        const del = d * c;
+        h *= del;
+        if (Math.abs(del - 1) < EPS) break;
+    }
+    return h;
+}
+
+function regBetaI(x, a, b) {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    const bt = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log(1 - x));
+    if (x < (a + 1) / (a + b + 2)) return bt * betacf(a, b, x) / a;
+    return 1 - bt * betacf(b, a, 1 - x) / b;
+}
+
+function bisectInv(cdfFn, targetP, lo, hi, allowExpandLower = false) {
+    for (let i = 0; i < 30 && cdfFn(hi) < targetP; i++) hi *= 2;
+    if (allowExpandLower) {
+        for (let i = 0; i < 30 && cdfFn(lo) > targetP; i++) lo *= 2;
+    }
+    for (let i = 0; i < 90; i++) {
+        const mid = 0.5 * (lo + hi);
+        if (cdfFn(mid) < targetP) lo = mid; else hi = mid;
+        if (hi - lo < 1e-10) break;
+    }
+    return 0.5 * (lo + hi);
+}
+
+// ==================== DEFINICIÓN DE DISTRIBUCIONES ====================
+const DISTRIBUTIONS = {
+    normal: {
+        name: "Normal (Gaussiana)", type: "continuous", notation: "X ~ N(μ, σ²)",
+        params: [{ id: "mu", label: "μ (media)", val: 0, step: 0.5 }, { id: "sigma", label: "σ (desvío > 0)", val: 1, step: 0.1, min: 0.0001 }],
+        defaultX: 1.96, defaultA: -1.96, defaultB: 1.96,
+        pdf: (x, p) => normalPDF((x - p.mu) / p.sigma) / p.sigma,
+        cdf: (x, p) => normalCDF((x - p.mu) / p.sigma),
+        inv: (q, p) => p.mu + p.sigma * normalInv(q),
+        moments: (p) => ({ E: p.mu, V: p.sigma * p.sigma }),
+        range: (p) => [p.mu - 4 * p.sigma, p.mu + 4 * p.sigma]
+    },
+    t: {
+        name: "t de Student", type: "continuous", notation: "X ~ T(k)",
+        params: [{ id: "df", label: "k (grados de libertad)", val: 15, step: 1, min: 1 }],
+        defaultX: 2.131, defaultA: -2.131, defaultB: 2.131,
+        pdf: (x, p) => Math.exp(logGamma((p.df + 1) / 2) - logGamma(p.df / 2)) / Math.sqrt(p.df * Math.PI) * Math.pow(1 + x * x / p.df, -(p.df + 1) / 2),
+        cdf: (x, p) => {
+            const v = p.df / (p.df + x * x);
+            const ib = 0.5 * regBetaI(v, p.df / 2, 0.5);
+            return x >= 0 ? 1 - ib : ib;
+        },
+        inv: (q, p) => bisectInv(x => DISTRIBUTIONS.t.cdf(x, p), q, -50, 50, true),
+        moments: (p) => ({ E: p.df > 1 ? 0 : NaN, V: p.df > 2 ? p.df / (p.df - 2) : NaN }),
+        range: () => [-4.5, 4.5]
+    },
+    chi2: {
+        name: "Chi-Cuadrado (χ²)", type: "continuous", notation: "X ~ χ²(k)",
+        params: [{ id: "df", label: "k (grados de libertad)", val: 12, step: 1, min: 1 }],
+        defaultX: 21.026, defaultA: 4.404, defaultB: 23.337,
+        pdf: (x, p) => x <= 0 ? 0 : Math.exp((p.df / 2 - 1) * Math.log(x) - x / 2 - (p.df / 2) * Math.log(2) - logGamma(p.df / 2)),
+        cdf: (x, p) => x <= 0 ? 0 : regGammaP(p.df / 2, x / 2),
+        inv: (q, p) => bisectInv(x => DISTRIBUTIONS.chi2.cdf(x, p), q, 0, Math.max(50, p.df + 12 * Math.sqrt(2 * p.df))),
+        moments: (p) => ({ E: p.df, V: 2 * p.df }),
+        range: (p) => [0, Math.max(12, p.df + 4 * Math.sqrt(2 * p.df))]
+    },
+    f: {
+        name: "F de Fisher-Snedecor", type: "continuous", notation: "X ~ F(d₁, d₂)",
+        params: [{ id: "d1", label: "d₁ (gl numerador)", val: 5, step: 1, min: 1 }, { id: "d2", label: "d₂ (gl denominador)", val: 12, step: 1, min: 1 }],
+        defaultX: 3.11, defaultA: 0.25, defaultB: 3.11,
+        pdf: (x, p) => {
+            if (x <= 0) return 0;
+            const d1 = p.d1, d2 = p.d2;
+            const logNum = (d1 / 2) * Math.log(d1) + (d2 / 2) * Math.log(d2) + (d1 / 2 - 1) * Math.log(x);
+            const logDen = logGamma(d1 / 2) + logGamma(d2 / 2) - logGamma((d1 + d2) / 2) + ((d1 + d2) / 2) * Math.log(d1 * x + d2);
+            return Math.exp(logNum - logDen);
+        },
+        cdf: (x, p) => x <= 0 ? 0 : regBetaI((p.d1 * x) / (p.d1 * x + p.d2), p.d1 / 2, p.d2 / 2),
+        inv: (q, p) => bisectInv(x => DISTRIBUTIONS.f.cdf(x, p), q, 0, 200),
+        moments: (p) => ({
+            E: p.d2 > 2 ? p.d2 / (p.d2 - 2) : NaN,
+            V: p.d2 > 4 ? (2 * p.d2 * p.d2 * (p.d1 + p.d2 - 2)) / (p.d1 * Math.pow(p.d2 - 2, 2) * (p.d2 - 4)) : NaN
+        }),
+        range: (p) => [0, Math.min(12, Math.max(5, DISTRIBUTIONS.f.inv(0.99, p)))]
+    },
+    gamma: {
+        name: "Gamma", type: "continuous", notation: "X ~ Gamma(α, β)  [E = αβ, escala β]",
+        params: [{ id: "alpha", label: "α (forma > 0)", val: 3, step: 0.5, min: 0.05 }, { id: "beta", label: "β (escala > 0)", val: 2, step: 0.5, min: 0.05 }],
+        defaultX: 6, defaultA: 2, defaultB: 10,
+        pdf: (x, p) => x <= 0 ? 0 : Math.exp((p.alpha - 1) * Math.log(x) - x / p.beta - p.alpha * Math.log(p.beta) - logGamma(p.alpha)),
+        cdf: (x, p) => x <= 0 ? 0 : regGammaP(p.alpha, x / p.beta),
+        inv: (q, p) => bisectInv(x => DISTRIBUTIONS.gamma.cdf(x, p), q, 0, Math.max(20, p.alpha * p.beta + 15 * Math.sqrt(p.alpha) * p.beta)),
+        moments: (p) => ({ E: p.alpha * p.beta, V: p.alpha * p.beta * p.beta }),
+        range: (p) => [0, p.alpha * p.beta + 4.5 * Math.sqrt(p.alpha) * p.beta]
+    },
+    exp: {
+        name: "Exponencial", type: "continuous", notation: "X ~ Exp(λ)  [E = 1/λ]",
+        params: [{ id: "lam", label: "λ (tasa > 0)", val: 0.5, step: 0.1, min: 0.01 }],
+        defaultX: 2, defaultA: 0.5, defaultB: 3,
+        pdf: (x, p) => x < 0 ? 0 : p.lam * Math.exp(-p.lam * x),
+        cdf: (x, p) => x < 0 ? 0 : 1 - Math.exp(-p.lam * x),
+        inv: (q, p) => -Math.log(1 - q) / p.lam,
+        moments: (p) => ({ E: 1 / p.lam, V: 1 / (p.lam * p.lam) }),
+        range: (p) => [0, 6 / p.lam]
+    },
+    uniform: {
+        name: "Uniforme Continua", type: "continuous", notation: "X ~ U(a, b)",
+        params: [{ id: "a", label: "a (mínimo)", val: 0, step: 1 }, { id: "b", label: "b (máximo > a)", val: 10, step: 1 }],
+        defaultX: 4, defaultA: 2, defaultB: 7,
+        pdf: (x, p) => (x >= p.a && x <= p.b && p.b > p.a) ? 1 / (p.b - p.a) : 0,
+        cdf: (x, p) => x <= p.a ? 0 : (x >= p.b ? 1 : (x - p.a) / (p.b - p.a)),
+        inv: (q, p) => p.a + q * (p.b - p.a),
+        moments: (p) => ({ E: 0.5 * (p.a + p.b), V: Math.pow(p.b - p.a, 2) / 12 }),
+        range: (p) => [p.a - 0.15 * (p.b - p.a), p.b + 0.15 * (p.b - p.a)]
+    },
+    beta: {
+        name: "Beta", type: "continuous", notation: "X ~ Beta(α, β)",
+        params: [{ id: "a", label: "α (> 0)", val: 2, step: 0.5, min: 0.1 }, { id: "b", label: "β (> 0)", val: 5, step: 0.5, min: 0.1 }],
+        defaultX: 0.3, defaultA: 0.1, defaultB: 0.5,
+        pdf: (x, p) => (x <= 0 || x >= 1) ? 0 : Math.exp((p.a - 1) * Math.log(x) + (p.b - 1) * Math.log(1 - x) + logGamma(p.a + p.b) - logGamma(p.a) - logGamma(p.b)),
+        cdf: (x, p) => regBetaI(x, p.a, p.b),
+        inv: (q, p) => bisectInv(x => DISTRIBUTIONS.beta.cdf(x, p), q, 0, 1),
+        moments: (p) => ({ E: p.a / (p.a + p.b), V: (p.a * p.b) / (Math.pow(p.a + p.b, 2) * (p.a + p.b + 1)) }),
+        range: () => [0, 1]
+    },
+    lognormal: {
+        name: "Log-Normal", type: "continuous", notation: "ln(X) ~ N(μ, σ²)",
+        params: [{ id: "mu", label: "μ", val: 0, step: 0.2 }, { id: "sigma", label: "σ (> 0)", val: 0.5, step: 0.1, min: 0.05 }],
+        defaultX: 1.5, defaultA: 0.5, defaultB: 2.0,
+        pdf: (x, p) => x <= 0 ? 0 : normalPDF((Math.log(x) - p.mu) / p.sigma) / (x * p.sigma),
+        cdf: (x, p) => x <= 0 ? 0 : normalCDF((Math.log(x) - p.mu) / p.sigma),
+        inv: (q, p) => Math.exp(p.mu + p.sigma * normalInv(q)),
+        moments: (p) => ({ E: Math.exp(p.mu + 0.5 * p.sigma * p.sigma), V: (Math.exp(p.sigma * p.sigma) - 1) * Math.exp(2 * p.mu + p.sigma * p.sigma) }),
+        range: (p) => [0, Math.exp(p.mu + 3 * p.sigma)]
+    },
+    binomial: {
+        name: "Binomial", type: "discrete", notation: "X ~ Bin(n, p)",
+        params: [{ id: "n", label: "n (ensayos)", val: 20, step: 1, min: 1 }, { id: "p", label: "p (éxito 0..1)", val: 0.4, step: 0.05, min: 0.001, max: 0.999 }],
+        defaultX: 8, defaultA: 5, defaultB: 11,
+        pmf: (k, p) => (k < 0 || k > p.n || !Number.isInteger(k)) ? 0 : Math.exp(logComb(p.n, k) + k * Math.log(p.p) + (p.n - k) * Math.log(1 - p.p)),
+        moments: (p) => ({ E: p.n * p.p, V: p.n * p.p * (1 - p.p) }),
+        range: (p) => [0, p.n]
+    },
+    poisson: {
+        name: "Poisson", type: "discrete", notation: "X ~ Poisson(λ)",
+        params: [{ id: "lam", label: "λ (tasa > 0)", val: 5, step: 0.5, min: 0.1 }],
+        defaultX: 5, defaultA: 2, defaultB: 8,
+        pmf: (k, p) => (k < 0 || !Number.isInteger(k)) ? 0 : Math.exp(k * Math.log(p.lam) - p.lam - logGamma(k + 1)),
+        moments: (p) => ({ E: p.lam, V: p.lam }),
+        range: (p) => [0, Math.ceil(p.lam + 4.5 * Math.sqrt(p.lam) + 3)]
+    },
+    geometric: {
+        name: "Geométrica (I)", type: "discrete", notation: "X ~ Geom(p)  [X = 1, 2, ...]",
+        params: [{ id: "p", label: "p (éxito 0..1)", val: 0.3, step: 0.05, min: 0.01, max: 0.99 }],
+        defaultX: 3, defaultA: 1, defaultB: 5,
+        pmf: (k, p) => (k < 1 || !Number.isInteger(k)) ? 0 : Math.pow(1 - p.p, k - 1) * p.p,
+        moments: (p) => ({ E: 1 / p.p, V: (1 - p.p) / (p.p * p.p) }),
+        range: (p) => [1, Math.min(60, Math.ceil(5 / p.p))]
+    },
+    hypergeom: {
+        name: "Hipergeométrica", type: "discrete", notation: "X ~ Hipergeom(N, K, n)",
+        params: [{ id: "N", label: "N (población)", val: 50, step: 1, min: 2 }, { id: "K", label: "K (éxitos pob.)", val: 15, step: 1, min: 1 }, { id: "n", label: "n (muestra)", val: 10, step: 1, min: 1 }],
+        defaultX: 3, defaultA: 1, defaultB: 5,
+        pmf: (k, p) => {
+            if (!Number.isInteger(k) || k < Math.max(0, p.n + p.K - p.N) || k > Math.min(p.n, p.K)) return 0;
+            return Math.exp(logComb(p.K, k) + logComb(p.N - p.K, p.n - k) - logComb(p.N, p.n));
+        },
+        moments: (p) => ({ E: p.n * p.K / p.N, V: p.n * (p.K / p.N) * (1 - p.K / p.N) * (p.N - p.n) / (p.N - 1) }),
+        range: (p) => [Math.max(0, p.n + p.K - p.N), Math.min(p.n, p.K)]
+    },
+    negbin: {
+        name: "Binomial Negativa", type: "discrete", notation: "X ~ BN(r, p)  [ensayos hasta r éxitos]",
+        params: [{ id: "r", label: "r (éxitos)", val: 3, step: 1, min: 1 }, { id: "p", label: "p (éxito 0..1)", val: 0.4, step: 0.05, min: 0.05, max: 0.99 }],
+        defaultX: 7, defaultA: 4, defaultB: 10,
+        pmf: (k, p) => (k < p.r || !Number.isInteger(k)) ? 0 : Math.exp(logComb(k - 1, p.r - 1) + p.r * Math.log(p.p) + (k - p.r) * Math.log(1 - p.p)),
+        moments: (p) => ({ E: p.r / p.p, V: p.r * (1 - p.p) / (p.p * p.p) }),
+        range: (p) => [p.r, Math.min(80, Math.ceil(p.r / p.p + 4 * Math.sqrt(p.r * (1 - p.p)) / p.p))]
+    }
+};
+
+let currentKey = "normal";
+
+function discreteCDF(dist, x, params) {
+    const [lo, hi] = dist.range(params);
+    const maxK = Math.min(Math.floor(x), hi + 200);
+    let s = 0;
+    for (let k = lo; k <= maxK; k++) s += dist.pmf(k, params);
+    return Math.min(1, s);
+}
+
+function getParams() {
+    const dist = DISTRIBUTIONS[currentKey];
+    const obj = {};
+    for (const pr of dist.params) {
+        const el = document.getElementById("param_" + pr.id);
+        let v = parseFloat(el ? el.value : pr.val);
+        if (isNaN(v)) v = pr.val;
+        if (pr.min !== undefined && v < pr.min) v = pr.min;
+        if (pr.max !== undefined && v > pr.max) v = pr.max;
+        obj[pr.id] = v;
+    }
+    return obj;
+}
+
+function buildSidebar() {
+    const cont = document.getElementById("contList");
+    const disc = document.getElementById("discList");
+    cont.innerHTML = ""; disc.innerHTML = "";
+    for (const [key, d] of Object.entries(DISTRIBUTIONS)) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.id = "btn_" + key;
+        btn.className = "dist-btn w-full text-left px-3 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer";
+        btn.textContent = d.name;
+        btn.onclick = () => selectDist(key);
+        (d.type === "continuous" ? cont : disc).appendChild(btn);
+    }
+}
+
+function selectDist(key) {
+    currentKey = key;
+    const d = DISTRIBUTIONS[key];
+    document.querySelectorAll(".dist-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById("btn_" + key)?.classList.add("active");
+
+    document.getElementById("distTitle").textContent = "Distribución " + d.name;
+    document.getElementById("distNotation").textContent = d.notation;
+    const badge = document.getElementById("distTypeBadge");
+    badge.textContent = d.type === "continuous" ? "Continua" : "Discreta";
+    badge.className = d.type === "continuous"
+        ? "inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide bg-indigo-100 text-indigo-800 mb-1"
+        : "inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide bg-emerald-100 text-emerald-800 mb-1";
+
+    const pc = document.getElementById("paramsContainer");
+    pc.innerHTML = d.params.map(pr => `
+        <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">${pr.label}</label>
+            <input id="param_${pr.id}" type="number" value="${pr.val}" step="${pr.step}"
+                ${pr.min !== undefined ? `min="${pr.min}"` : ""} ${pr.max !== undefined ? `max="${pr.max}"` : ""}
+                oninput="computeAndDraw()"
+                class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+    `).join("");
+
+    const modeSel = document.getElementById("probMode");
+    const eqOpt = modeSel.querySelector('option[value="eq"]');
+    eqOpt.disabled = (d.type === "continuous");
+    if (d.type === "continuous" && modeSel.value === "eq") modeSel.value = "le";
+
+    renderXInputs();
+    computeAndDraw();
+}
+
+function renderXInputs() {
+    const d = DISTRIBUTIONS[currentKey];
+    const mode = document.getElementById("probMode").value;
+    const xc = document.getElementById("xInputsContainer");
+    const step = d.type === "discrete" ? "1" : "0.01";
+    if (mode === "between" || mode === "outside") {
+        xc.innerHTML = `
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">a (izq.)</label>
+                <input id="valA" type="number" step="${step}" value="${d.defaultA}" oninput="computeAndDraw()"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm font-semibold text-slate-800">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">b (der.)</label>
+                <input id="valB" type="number" step="${step}" value="${d.defaultB}" oninput="computeAndDraw()"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm font-semibold text-slate-800">
+            </div>`;
+    } else {
+        xc.innerHTML = `
+            <div class="col-span-2">
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Valor x</label>
+                <input id="valX" type="number" step="${step}" value="${d.defaultX}" oninput="computeAndDraw()"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm font-semibold text-slate-800">
+            </div>`;
+    }
+}
+
+function onModeChange() { renderXInputs(); computeAndDraw(); }
+
+function setQuickProb(p) {
+    const modeSel = document.getElementById("probMode");
+    if (modeSel.value !== "le" && modeSel.value !== "ge") {
+        modeSel.value = "le";
+        renderXInputs();
+    }
+    document.getElementById("probOutput").value = p;
+    solveInverseFromProb();
+}
+
+function solveInverseFromProb() {
+    const d = DISTRIBUTIONS[currentKey];
+    const params = getParams();
+    const mode = document.getElementById("probMode").value;
+    let pTarget = parseFloat(document.getElementById("probOutput").value);
+    const status = document.getElementById("statusMsg");
+    if (isNaN(pTarget) || pTarget <= 0 || pTarget >= 1) {
+        status.textContent = "Ingresá una probabilidad estrictamente entre 0 y 1 para hallar el cuantil x.";
+        status.classList.remove("hidden");
+        return;
+    }
+    status.classList.add("hidden");
+
+    const targetCDF = (mode === "ge") ? (1 - pTarget) : pTarget;
+    if (d.type === "continuous") {
+        const xSol = d.inv(targetCDF, params);
+        const el = document.getElementById("valX");
+        if (el) el.value = Number(xSol.toFixed(4));
+    } else {
+        const [lo, hi] = d.range(params);
+        let acc = 0, k = lo;
+        while (k <= hi + 400) {
+            acc += d.pmf(k, params);
+            if (acc >= targetCDF) break;
+            k++;
+        }
+        const el = document.getElementById("valX");
+        if (el) el.value = k;
+    }
+    computeAndDraw();
+}
+
+function computeAndDraw() {
+    const d = DISTRIBUTIONS[currentKey];
+    const params = getParams();
+    const mode = document.getElementById("probMode").value;
+    const status = document.getElementById("statusMsg");
+    status.classList.add("hidden");
+
+    const m = d.moments(params);
+    const fmt = v => (isNaN(v) || !isFinite(v)) ? "No existe" : Number(v.toFixed(4)).toString().replace(".", ",");
+    document.getElementById("momentsBox").innerHTML = `
+        <span class="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 font-semibold text-slate-700">E(X) = ${fmt(m.E)}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 font-semibold text-slate-700">Var(X) = ${fmt(m.V)}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 font-semibold text-slate-700">DE(X) = ${fmt(Math.sqrt(m.V))}</span>`;
+
+    let prob = 0, xVal = 0, aVal = 0, bVal = 0;
+    const cdf = x => d.type === "continuous" ? d.cdf(x, params) : discreteCDF(d, x, params);
+    const labelMap = { le: "Probabilidad P(X ≤ x)", ge: "Probabilidad P(X ≥ x)", eq: "Probabilidad P(X = x)", between: "Probabilidad P(a ≤ X ≤ b)", outside: "Probabilidad P(X ≤ a ó X ≥ b)" };
+    document.getElementById("probResultLabel").textContent = labelMap[mode];
+
+    if (mode === "between" || mode === "outside") {
+        aVal = parseFloat(document.getElementById("valA")?.value ?? d.defaultA);
+        bVal = parseFloat(document.getElementById("valB")?.value ?? d.defaultB);
+        if (aVal > bVal) { const tmp = aVal; aVal = bVal; bVal = tmp; }
+        if (d.type === "continuous") {
+            const inner = Math.max(0, cdf(bVal) - cdf(aVal));
+            prob = mode === "between" ? inner : 1 - inner;
+        } else {
+            const inner = Math.max(0, cdf(bVal) - cdf(aVal - 1));
+            prob = mode === "between" ? inner : 1 - inner;
+        }
+    } else {
+        xVal = parseFloat(document.getElementById("valX")?.value ?? d.defaultX);
+        if (mode === "le") prob = cdf(xVal);
+        else if (mode === "ge") prob = d.type === "continuous" ? 1 - cdf(xVal) : 1 - cdf(xVal - 1);
+        else if (mode === "eq") prob = d.type === "discrete" ? d.pmf(Math.round(xVal), params) : 0;
+    }
+
+    prob = Math.max(0, Math.min(1, prob));
+    document.getElementById("probOutput").value = prob.toFixed(5);
+    drawChart(d, params, mode, xVal, aVal, bVal, prob);
+}
+
+function drawChart(d, params, mode, xVal, aVal, bVal, prob) {
+    const canvas = document.getElementById("distCanvas");
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth || 700;
+    const h = canvas.clientHeight || 300;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+
+    const pad = { l: 46, r: 22, t: 24, b: 38 };
+    const pw = w - pad.l - pad.r;
+    const ph = h - pad.t - pad.b;
+
+    const [xMin, xMax] = d.range(params);
+    const toX = x => pad.l + ((x - xMin) / (xMax - xMin || 1)) * pw;
+
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t + ph);
+    ctx.lineTo(pad.l + pw, pad.t + ph);
+    ctx.stroke();
+
+    if (d.type === "continuous") {
+        const N = 320;
+        const pts = [];
+        let maxY = 0;
+        for (let i = 0; i <= N; i++) {
+            const x = xMin + (i / N) * (xMax - xMin);
+            const y = d.pdf(x, params);
+            if (isFinite(y) && y > maxY) maxY = y;
+            pts.push([x, isFinite(y) ? y : 0]);
+        }
+        maxY = maxY * 1.12 || 1;
+        const toY = y => pad.t + ph - (y / maxY) * ph;
+
+        const isShaded = x => {
+            if (mode === "le") return x <= xVal;
+            if (mode === "ge") return x >= xVal;
+            if (mode === "between") return x >= aVal && x <= bVal;
+            if (mode === "outside") return x <= aVal || x >= bVal;
+            return false;
+        };
+        ctx.fillStyle = "rgba(225, 29, 72, 0.30)";
+        ctx.beginPath();
+        let inSeg = false;
+        for (let i = 0; i < pts.length; i++) {
+            const [x, y] = pts[i];
+            if (isShaded(x)) {
+                if (!inSeg) { ctx.moveTo(toX(x), pad.t + ph); inSeg = true; }
+                ctx.lineTo(toX(x), toY(y));
+            } else if (inSeg) {
+                ctx.lineTo(toX(pts[i - 1][0]), pad.t + ph);
+                ctx.closePath();
+                inSeg = false;
+            }
+        }
+        if (inSeg) { ctx.lineTo(toX(pts[pts.length - 1][0]), pad.t + ph); ctx.closePath(); }
+        ctx.fill();
+
+        ctx.strokeStyle = "#1e293b";
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        pts.forEach(([x, y], i) => i === 0 ? ctx.moveTo(toX(x), toY(y)) : ctx.lineTo(toX(x), toY(y)));
+        ctx.stroke();
+    } else {
+        const lo = Math.floor(xMin), hi = Math.ceil(xMax);
+        const bars = [];
+        let maxY = 0;
+        for (let k = lo; k <= hi; k++) {
+            const y = d.pmf(k, params);
+            if (y > maxY) maxY = y;
+            bars.push([k, y]);
+        }
+        maxY = maxY * 1.15 || 1;
+        const toY = y => pad.t + ph - (y / maxY) * ph;
+        const bw = Math.max(4, Math.min(26, (pw / (bars.length + 1)) * 0.65));
+
+        const isShaded = k => {
+            if (mode === "le") return k <= Math.floor(xVal);
+            if (mode === "ge") return k >= Math.ceil(xVal);
+            if (mode === "eq") return k === Math.round(xVal);
+            if (mode === "between") return k >= Math.ceil(aVal) && k <= Math.floor(bVal);
+            if (mode === "outside") return k <= Math.floor(aVal) || k >= Math.ceil(bVal);
+            return false;
+        };
+
+        for (const [k, y] of bars) {
+            const cx = toX(k);
+            const top = toY(y);
+            ctx.fillStyle = isShaded(k) ? "#e11d48" : "#94a3b8";
+            ctx.fillRect(cx - bw / 2, top, bw, pad.t + ph - top);
+        }
+    }
+
+    ctx.fillStyle = "#475569";
+    ctx.font = "11px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    const ticks = 6;
+    for (let i = 0; i <= ticks; i++) {
+        const xv = xMin + (i / ticks) * (xMax - xMin);
+        const px = toX(xv);
+        ctx.fillText(Number(xv.toFixed(2)).toString(), px, pad.t + ph + 18);
+    }
+
+    ctx.fillStyle = "#be123c";
+    ctx.font = "bold 13px system-ui, sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(`Área = ${(prob * 100).toFixed(2)}%  (${prob.toFixed(5)})`, pad.l + pw - 4, pad.t + 10);
+}
+
+window.addEventListener("resize", computeAndDraw);
+buildSidebar();
+selectDist("normal");
+</script>
+</body>
+</html>
