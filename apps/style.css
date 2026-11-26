@@ -299,7 +299,7 @@ input.tight-checkbox {
 	padding: 5px;
 	border: solid 1px rgb(200,200,200);
 	border-radius: 3px;
-	background-color: rgb(230,230,230);
+	background-color: #ffffff;
 	box-shadow: 0px 0px 6px rgba(0,0,0,0.15);
 	text-align: left;
 	color: black;
@@ -336,7 +336,7 @@ input.tight-checkbox {
 .gemini-panel-body {
 	font-size: 100%;
 	overflow-x: auto;
-	opacity: 0.5;
+	opacity: 0.4;
 }
 
 .gemini-panel-body p {
