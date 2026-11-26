@@ -735,7 +735,11 @@
           showFixed();
         }
       });
-      flipHelp.appendChild(fixedBtnEl);
+      if (flipHelp.parentNode) {
+        flipHelp.parentNode.insertBefore(fixedBtnEl, flipHelp.nextSibling);
+      } else {
+        flipHelp.appendChild(fixedBtnEl);
+      }
     }
 
     fileInputEl = document.createElement("input");
