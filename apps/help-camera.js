@@ -2,10 +2,13 @@
   "use strict";
 
   var API_URL = "https://francomusco.duckdns.org/_api/gemini/chat";
+  var CONVERSATIONS_URL = "https://francomusco.duckdns.org/_api/gemini/conversations?limit=10";
+  var CONVERSATION_URL = "https://francomusco.duckdns.org/_api/gemini/conversation?id=";
   var MODEL_ID = "gemini-4-hydrogen";
   var THINKING_MODE = "off";
   var MAX_STORED_RESOLUTIONS = 20;
   var STORAGE_KEY = "gemini_help_resolutions_" + window.location.pathname;
+  var PENDING_KEY = "gemini_help_pending_" + window.location.pathname;
 
   var resolutions = [];
   var activeIndex = -1;
@@ -404,6 +407,7 @@
   async function processImageFile(file) {
     if (!file) return;
     lastFile = file;
+    savePendingJob();
     showLoading();
 
     try {
@@ -453,9 +457,87 @@
         title: contextTitle
       });
       saveResolutions();
+      clearPendingJob();
       showResolution(resolutions.length - 1);
     } catch (err) {
       showError(err && err.message ? err.message : "No se pudo completar la consulta.");
+    }
+  }
+
+  function savePendingJob() {
+    try {
+      window.localStorage.setItem(
+        PENDING_KEY,
+        JSON.stringify({ startedAt: Date.now() })
+      );
+    } catch (_e) {}
+  }
+
+  function clearPendingJob() {
+    try {
+      window.localStorage.removeItem(PENDING_KEY);
+    } catch (_e) {}
+  }
+
+  async function recoverPendingJobIfAny() {
+    var raw = null;
+    try {
+      raw = window.localStorage.getItem(PENDING_KEY);
+    } catch (_e) {
+      return;
+    }
+    if (!raw) return;
+
+    var pending = null;
+    try {
+      pending = JSON.parse(raw);
+    } catch (_e) {
+      clearPendingJob();
+      return;
+    }
+
+    if (!pending || !pending.startedAt || Date.now() - pending.startedAt > 15 * 60 * 1000) {
+      clearPendingJob();
+      return;
+    }
+
+    try {
+      var listResp = await fetch(CONVERSATIONS_URL);
+      if (!listResp.ok) return;
+      var listData = await listResp.json();
+      if (!listData || !listData.ok || !Array.isArray(listData.conversations)) return;
+
+      var match = null;
+      for (var i = 0; i < listData.conversations.length; i++) {
+        var c = listData.conversations[i];
+        var ts = Date.parse(c.createdAt || c.lastActive || "");
+        if (!isNaN(ts) && ts >= pending.startedAt - 15000) {
+          match = c;
+          break;
+        }
+      }
+      if (!match || !match.id) return;
+
+      var detailResp = await fetch(CONVERSATION_URL + encodeURIComponent(match.id));
+      if (!detailResp.ok) return;
+      var detail = await detailResp.json();
+      if (!detail || !detail.ok || !Array.isArray(detail.messages)) return;
+
+      for (var j = detail.messages.length - 1; j >= 0; j--) {
+        if (detail.messages[j].role === "assistant" && detail.messages[j].content) {
+          resolutions.push({
+            reply: detail.messages[j].content,
+            timeLabel: formatTimeLabel(new Date()),
+            title: document.title || "Estadística"
+          });
+          saveResolutions();
+          clearPendingJob();
+          showResolution(resolutions.length - 1);
+          return;
+        }
+      }
+    } catch (_e) {
+      // Ignore recovery errors
     }
   }
 
@@ -560,6 +642,7 @@
 
     resolutions = loadResolutions();
     renderSolvedButtons();
+    recoverPendingJobIfAny();
   }
 
   function init() {
