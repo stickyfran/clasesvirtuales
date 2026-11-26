@@ -11,6 +11,7 @@
   var activeIndex = -1;
   var isPanelOpen = false;
   var isLoading = false;
+  var isTextHidden = false;
   var lastFile = null;
   var loadingTimer = null;
 
@@ -559,6 +560,12 @@
 
     panelEl.appendChild(headerEl);
     panelEl.appendChild(panelBodyEl);
+
+    panelEl.addEventListener("click", function (e) {
+      if (e.target && e.target.closest && e.target.closest("button")) return;
+      isTextHidden = !isTextHidden;
+      panelBodyEl.style.opacity = isTextHidden ? "0" : "0.4";
+    });
 
     var footerEl = document.querySelector("footer");
     if (footerEl && footerEl.parentNode) {
